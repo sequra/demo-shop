@@ -1,0 +1,10 @@
+services:
+  sequra_demo_shop:
+    build: .
+    ports:
+      - "8081:80"
+    volumes:
+      - ./:/var/www/html/backend
+      - ../frontend:/var/www/html/frontend
+      - ./xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+    working_dir: /var/www/html/backend

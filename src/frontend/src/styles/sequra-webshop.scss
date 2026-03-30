@@ -1,0 +1,854 @@
+@use 'variables' as *;
+
+sequra-webshop {
+  display: block;
+  font-family: 'Figtree', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  min-height: 100vh;
+  background: #{$sq-color--grey-05};
+
+  /* Define CSS custom properties */
+  --sequra-primary: #{$sq-color--primary};
+  --sequra-primary-dark: #{$sq-color--primary-hover};
+  --sequra-secondary: #{$sq-color--blue-40};
+  --sequra-accent: #{$sq-color--danger};
+  --sequra-success: #{$sq-color-green--40};
+  --sequra-warning: #{$sq-color--warning};
+  --sequra-danger: #{$sq-color--danger};
+
+  --gray-50: #{$sq-color--grey-05};
+  --gray-100: #{$sq-color--grey-10};
+  --gray-200: #{$sq-color--grey-20};
+  --gray-300: #{$sq-color--grey-30};
+  --gray-400: #{$sq-color--grey-40};
+  --gray-500: #{$sq-color--grey-50};
+  --gray-600: #{$sq-color--grey-60};
+  --gray-700: #{$sq-color--grey-70};
+  --gray-800: #{$sq-color--sequra-black};
+  --gray-900: #{$sq-color--sequra-black};
+
+  --white: #{$sq-color--white};
+  --black: #{$sq-color--black};
+
+  --border-radius: 8px;
+  --border-radius-lg: 12px;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+}
+
+sequra-webshop *, sequra-webshop *::before, sequra-webshop *::after {
+  box-sizing: border-box;
+}
+
+sequra-webshop .sq-app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+sequra-webshop .sq-main-content {
+  flex: 1;
+  padding-top: 1rem;
+}
+
+sequra-webshop .floating-cart-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+sequra-webshop .floating-cart-btn {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--sequra-primary, #00b4a6);
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba($sq-color--primary, 0.4);
+  transition: all 0.3s ease;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+sequra-webshop .floating-cart-btn:hover {
+  background: var(--sequra-primary-dark, #00a094);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba($sq-color--primary, 0.6);
+}
+
+sequra-webshop .cart-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: var(--sequra-accent, #ff6b6b);
+  color: white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  opacity: 0;
+  transform: scale(0);
+  transition: all 0.3s ease;
+}
+
+sequra-webshop .cart-badge.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+sequra-webshop .notification {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  background: var(--sequra-success);
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-lg);
+  z-index: 1001;
+  opacity: 0;
+  transform: translateX(100%);
+  transition: all 0.3s ease;
+}
+
+sequra-webshop .notification.show {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+sequra-webshop .notification.error {
+  background: var(--sequra-danger);
+}
+
+sequra-webshop .notification.warning {
+  background: var(--sequra-warning);
+}
+
+sequra-webshop .loading {
+  text-align: center;
+  padding: 3rem;
+  color: var(--gray-500);
+}
+
+sequra-webshop .simple-checkout {
+  padding: 2rem 0;
+}
+
+sequra-webshop .sq-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+sequra-webshop .checkout-content {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+sequra-webshop .checkout-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+sequra-webshop .checkout-right {
+  position: sticky;
+  top: 2rem;
+  align-self: start;
+}
+
+sequra-webshop .checkout-section {
+  background: var(--gray-50, #f8fafc);
+  border: 1px solid var(--gray-200, #e2e8f0);
+  border-radius: var(--border-radius, 8px);
+  padding: 1.5rem;
+}
+
+sequra-webshop .checkout-section h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--gray-900, #111827);
+}
+
+/* Address Form Styles */
+sequra-webshop .address-form .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+sequra-webshop .form-field {
+  margin-bottom: 1rem;
+}
+
+sequra-webshop .form-field:last-child {
+  margin-bottom: 0;
+}
+
+sequra-webshop .form-field label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--gray-700, #374151);
+  font-size: 0.9rem;
+}
+
+sequra-webshop .form-field input,
+sequra-webshop .form-field select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--gray-300, #d1d5db);
+  border-radius: var(--border-radius, 8px);
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+sequra-webshop .form-field input:focus,
+sequra-webshop .form-field select:focus {
+  outline: none;
+  border-color: var(--sequra-primary, #00b4a6);
+  box-shadow: 0 0 0 3px rgba($sq-color--primary, 0.1);
+}
+
+/* Shipping Options Styles */
+sequra-webshop .shipping-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+sequra-webshop .shipping-option {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border: 2px solid var(--gray-200, #e2e8f0);
+  border-radius: var(--border-radius, 8px);
+  cursor: pointer;
+  transition: all 0.2s;
+  background: white;
+}
+
+sequra-webshop .shipping-option:hover {
+  border-color: var(--gray-300, #d1d5db);
+}
+
+sequra-webshop .shipping-option:has(input:checked) {
+  border-color: var(--sequra-primary, #00b4a6);
+  background: rgba($sq-color--primary, 0.05);
+}
+
+sequra-webshop .shipping-option input[type="radio"] {
+  margin: 0;
+  width: auto;
+}
+
+sequra-webshop .shipping-details {
+  flex: 1;
+}
+
+sequra-webshop .shipping-name {
+  font-weight: 600;
+  color: var(--gray-900, #111827);
+}
+
+sequra-webshop .shipping-time {
+  font-size: 0.9rem;
+  color: var(--gray-600, #4b5563);
+}
+
+sequra-webshop .shipping-price {
+  font-weight: 600;
+  color: var(--gray-900, #111827);
+}
+
+/* Discount Form Styles */
+sequra-webshop .discount-input-group {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+sequra-webshop .discount-input-group input {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid var(--gray-300, #d1d5db);
+  border-radius: var(--border-radius, 8px);
+  font-size: 1rem;
+}
+
+sequra-webshop .apply-discount-btn {
+  padding: 0.75rem 1.5rem;
+  background: var(--sequra-primary, #00b4a6);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius, 8px);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+
+sequra-webshop .apply-discount-btn:hover {
+  background: var(--sequra-primary-dark, #00a094);
+}
+
+sequra-webshop .discount-applied {
+  color: var(--sequra-success);
+  font-weight: 500;
+  padding: 0.5rem;
+  background: rgba($sq-color-green--40, 0.1);
+  border-radius: var(--border-radius, 8px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+sequra-webshop .remove-discount-btn {
+  background: none;
+  border: 1px solid var(--sequra-success);
+  color: var(--sequra-success);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+sequra-webshop .remove-discount-btn:hover {
+  background: var(--sequra-success);
+  color: white;
+}
+
+/* Order Summary Updates */
+sequra-webshop .checkout-totals {
+  border-top: 1px solid var(--gray-200, #e2e8f0);
+  margin-top: 1rem;
+  padding-top: 1rem;
+}
+
+sequra-webshop .total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+sequra-webshop .total-row.discount {
+  color: var(--sequra-success);
+}
+
+sequra-webshop .total-row.final {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--gray-200, #e2e8f0);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--gray-900, #111827);
+}
+
+sequra-webshop .checkout-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+sequra-webshop .back-btn {
+  background: var(--gray-100, #f1f5f9);
+  border: 1px solid var(--gray-200, #e2e8f0);
+  color: var(--gray-700, #334155);
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius, 8px);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+sequra-webshop .back-btn:hover {
+  background: var(--gray-200, #e2e8f0);
+}
+
+sequra-webshop .order-summary {
+  background: white;
+  border: 1px solid var(--gray-200, #e2e8f0);
+  border-radius: var(--border-radius-lg, 12px);
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+sequra-webshop .checkout-items {
+  margin: 1rem 0;
+}
+
+sequra-webshop .checkout-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--gray-200, #e2e8f0);
+}
+
+sequra-webshop .checkout-item:last-child {
+  border-bottom: none;
+}
+
+sequra-webshop .checkout-item img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: var(--border-radius, 8px);
+}
+
+sequra-webshop .item-details {
+  flex: 1;
+}
+
+sequra-webshop .item-name {
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+sequra-webshop .item-qty {
+  font-size: 0.875rem;
+  color: var(--gray-600, #475569);
+}
+
+sequra-webshop .item-total {
+  font-weight: 600;
+}
+
+sequra-webshop .checkout-total {
+  border-top: 1px solid var(--gray-200, #e2e8f0);
+  padding-top: 1rem;
+  margin: 1rem 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  text-align: right;
+}
+
+sequra-webshop .sequra-options {
+  margin: 1.5rem 0;
+}
+
+sequra-webshop .payment-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+sequra-webshop .payment-option {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-bottom: 1px solid var(--gray-200, #e2e8f0);
+  cursor: pointer;
+  transition: all 0.2s;
+  background: white;
+}
+
+sequra-webshop .payment-option:first-child {
+  border-top: 1px solid var(--gray-200, #e2e8f0);
+}
+
+sequra-webshop .payment-option:hover {
+  background: rgba($sq-color--primary, 0.02);
+}
+
+sequra-webshop .payment-option input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--sequra-primary, #00b4a6);
+}
+
+sequra-webshop .sequra-logo {
+  padding: 0.35rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+sequra-webshop .sequra-logo-green {
+  background: var(--sequra-primary, #00b4a6);
+  color: white;
+}
+
+sequra-webshop .sequra-logo-dark {
+  background: #{$sq-color--sequra-black};
+  color: white;
+}
+
+sequra-webshop .sequra-text {
+  font-family: inherit;
+  letter-spacing: -0.5px;
+}
+
+sequra-webshop .sequra-q {
+  font-weight: 700;
+}
+
+sequra-webshop .payment-text {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--gray-700, #374151);
+}
+
+sequra-webshop .info-link {
+  color: var(--sequra-primary, #00b4a6);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+sequra-webshop .info-link:hover {
+  text-decoration: underline;
+}
+
+sequra-webshop .complete-order-btn {
+  width: 100%;
+  background: var(--sequra-primary, #00b4a6);
+  color: white;
+  border: none;
+  padding: 1rem;
+  border-radius: var(--border-radius, 8px);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 1rem;
+}
+
+sequra-webshop .complete-order-btn:hover {
+  background: var(--sequra-primary-dark, #00a094);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+  sequra-webshop .floating-cart-container {
+    top: 15px;
+    right: 15px;
+  }
+
+  sequra-webshop .floating-cart-btn {
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+  }
+
+  sequra-webshop .cart-badge {
+    width: 20px;
+    height: 20px;
+    font-size: 11px;
+    top: -3px;
+    right: -3px;
+  }
+
+  sequra-webshop .notification {
+    left: 1rem;
+    right: 1rem;
+    top: 1rem;
+  }
+
+  sequra-webshop .checkout-content {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  sequra-webshop .checkout-right {
+    position: static;
+  }
+
+  sequra-webshop .address-form .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  sequra-webshop .shipping-option {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  sequra-webshop .discount-input-group {
+    flex-direction: column;
+  }
+}
+
+/* Credentials Panel Styles */
+sequra-webshop .floating-buttons {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+sequra-webshop .credentials-toggle-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--gray-700, #334155);
+  border: none;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+sequra-webshop .credentials-toggle-btn:hover {
+  background: var(--gray-800, #1e293b);
+  transform: translateY(-1px);
+}
+
+sequra-webshop .credentials-toggle-btn.saved {
+  background: var(--sequra-success, #28a745);
+}
+
+sequra-webshop .credentials-status {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background: white;
+  color: var(--sequra-success, #28a745);
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+sequra-webshop .credentials-panel {
+  position: absolute;
+  top: 70px;
+  right: 0;
+  z-index: 1001;
+  background: white;
+  border-radius: var(--border-radius-lg, 12px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  padding: 1.25rem;
+  width: 320px;
+  border: 1px solid var(--gray-200, #e2e8f0);
+}
+
+sequra-webshop .credentials-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+sequra-webshop .credentials-header h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--gray-800, #1e293b);
+}
+
+sequra-webshop .credentials-close {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: var(--gray-500, #64748b);
+  padding: 4px;
+}
+
+sequra-webshop .credentials-field {
+  margin-bottom: 0.75rem;
+}
+
+sequra-webshop .credentials-field label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--gray-600, #475569);
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+
+sequra-webshop .credentials-field input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--gray-300, #cbd5e1);
+  border-radius: var(--border-radius, 8px);
+  font-size: 0.85rem;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+sequra-webshop .credentials-field input:focus {
+  outline: none;
+  border-color: var(--sequra-primary, #00b4a6);
+  box-shadow: 0 0 0 3px rgba($sq-color--primary, 0.1);
+}
+
+sequra-webshop .credentials-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+sequra-webshop .credentials-save-btn {
+  flex: 1;
+  padding: 0.5rem;
+  background: var(--sequra-primary, #00b4a6);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius, 8px);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+sequra-webshop .credentials-save-btn:hover {
+  background: var(--sequra-primary-dark, #00a094);
+}
+
+sequra-webshop .credentials-clear-btn {
+  padding: 0.5rem 1rem;
+  background: var(--gray-100, #f1f5f9);
+  color: var(--gray-700, #334155);
+  border: 1px solid var(--gray-300, #cbd5e1);
+  border-radius: var(--border-radius, 8px);
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background 0.2s;
+}
+
+sequra-webshop .credentials-clear-btn:hover {
+  background: var(--gray-200, #e2e8f0);
+}
+
+sequra-webshop .credentials-status-msg {
+  margin-top: 0.75rem;
+  font-size: 0.75rem;
+  color: var(--gray-500, #64748b);
+  text-align: center;
+}
+
+sequra-webshop .credentials-status-msg.saved {
+  color: var(--sequra-success, #28a745);
+  font-weight: 500;
+}
+
+sequra-webshop .credentials-field select {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--gray-300, #cbd5e1);
+  border-radius: var(--border-radius, 8px);
+  font-size: 0.85rem;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+  background: white;
+  cursor: pointer;
+}
+
+sequra-webshop .credentials-field select:focus {
+  outline: none;
+  border-color: var(--sequra-primary, #00b4a6);
+  box-shadow: 0 0 0 3px rgba($sq-color--primary, 0.1);
+}
+
+sequra-webshop .settings-divider {
+  border: none;
+  border-top: 1px solid var(--gray-200, #e2e8f0);
+  margin: 1rem 0;
+}
+
+/* Payment Methods Dynamic Styles */
+sequra-webshop .payment-loading {
+  text-align: center;
+  padding: 1rem;
+  color: var(--gray-500, #64748b);
+  font-size: 0.9rem;
+}
+
+sequra-webshop .payment-error {
+  padding: 0.75rem;
+  background: rgba($sq-color--danger, 0.05);
+  border: 1px solid rgba($sq-color--danger, 0.3);
+  border-radius: var(--border-radius, 8px);
+  color: #{$sq-color--red-60};
+  font-size: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+sequra-webshop .payment-no-methods {
+  padding: 0.75rem;
+  background: var(--gray-50, #f8fafc);
+  border: 1px solid var(--gray-200, #e2e8f0);
+  border-radius: var(--border-radius, 8px);
+  color: var(--gray-600, #475569);
+  font-size: 0.85rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+sequra-webshop .retry-btn {
+  padding: 0.4rem 0.8rem;
+  background: var(--sequra-primary, #00b4a6);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius, 8px);
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+sequra-webshop .retry-btn:hover {
+  background: var(--sequra-primary-dark, #00a094);
+}
+
+sequra-webshop .payment-method-name {
+  font-weight: 500;
+  display: block;
+}
+
+sequra-webshop .payment-cost {
+  font-size: 0.8rem;
+  color: var(--gray-500, #64748b);
+  display: block;
+}
+
+sequra-webshop .payment-description {
+  font-size: 0.8rem;
+  color: var(--gray-600, #475569);
+  display: block;
+  margin-top: 2px;
+}
+
+sequra-webshop .payment-svg-icon {
+  width: 24px;
+  height: 24px;
+}
