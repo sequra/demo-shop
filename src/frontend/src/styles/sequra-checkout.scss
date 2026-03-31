@@ -1,0 +1,1298 @@
+@use 'variables' as *;
+
+sequra-checkout {
+  display: block;
+  font-family: 'Figtree', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  min-height: 100vh;
+  background: #{$sq-color--grey-05};
+
+  --sequra-primary: #{$sq-color--primary};
+  --sequra-primary-dark: #{$sq-color--primary-hover};
+  --sequra-secondary: #{$sq-color--blue-40};
+  --sequra-accent: #{$sq-color--danger};
+  --sequra-success: #{$sq-color-green--40};
+  --sequra-warning: #{$sq-color--warning};
+  --sequra-danger: #{$sq-color--danger};
+
+  --gray-50: #{$sq-color--grey-05};
+  --gray-100: #{$sq-color--grey-10};
+  --gray-200: #{$sq-color--grey-20};
+  --gray-300: #{$sq-color--grey-30};
+  --gray-400: #{$sq-color--grey-40};
+  --gray-500: #{$sq-color--grey-50};
+  --gray-600: #{$sq-color--grey-60};
+  --gray-700: #{$sq-color--grey-70};
+  --gray-800: #{$sq-color--sequra-black};
+  --gray-900: #{$sq-color--sequra-black};
+
+  --white: #{$sq-color--white};
+  --black: #{$sq-color--black};
+
+  --border-radius: 8px;
+  --border-radius-lg: 12px;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+}
+
+sequra-checkout *, sequra-checkout *::before, sequra-checkout *::after {
+  box-sizing: border-box;
+}
+
+/* Notification */
+sequra-checkout .notification {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  background: var(--sequra-success);
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1001;
+  opacity: 0;
+  transform: translateX(100%);
+  transition: all 0.3s ease;
+}
+
+sequra-checkout .notification.show {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+sequra-checkout .notification.error {
+  background: var(--sequra-danger);
+}
+
+sequra-checkout .notification.warning {
+  background: var(--sequra-warning);
+}
+
+/* Checkout layout */
+sequra-checkout .simple-checkout {
+  padding: 2rem 0;
+}
+
+sequra-checkout .sq-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+sequra-checkout .checkout-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+sequra-checkout .checkout-header h2 {
+  margin: 0;
+}
+
+/* Floating settings button & panel */
+sequra-checkout .floating-settings-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+sequra-checkout .settings-toggle-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--gray-700, #334155);
+  border: none;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+sequra-checkout .settings-toggle-btn:hover {
+  background: var(--gray-800, #1e293b);
+  transform: translateY(-1px);
+}
+
+sequra-checkout .credentials-panel {
+  position: absolute;
+  top: 55px;
+  right: 0;
+  z-index: 1001;
+  background: white;
+  border-radius: var(--border-radius-lg, 12px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  padding: 1.25rem;
+  width: 280px;
+  border: 1px solid var(--gray-200, #e2e8f0);
+}
+
+sequra-checkout .credentials-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+sequra-checkout .credentials-header h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--gray-800, #1e293b);
+}
+
+sequra-checkout .credentials-close {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: var(--gray-500, #64748b);
+  padding: 4px;
+}
+
+sequra-checkout .credentials-field {
+  margin-bottom: 0.75rem;
+}
+
+sequra-checkout .credentials-field label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--gray-600, #475569);
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+
+sequra-checkout .credentials-field select {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--gray-300, #cbd5e1);
+  border-radius: var(--border-radius, 8px);
+  font-size: 0.85rem;
+  transition: border-color 0.2s;
+  background: white;
+  cursor: pointer;
+}
+
+sequra-checkout .credentials-field select:focus {
+  outline: none;
+  border-color: var(--sequra-primary, #00b4a6);
+  box-shadow: 0 0 0 3px rgba($sq-color--primary, 0.1);
+}
+
+sequra-checkout .settings-divider {
+  border: none;
+  border-top: 1px solid var(--gray-200, #e2e8f0);
+  margin: 0.75rem 0;
+}
+
+sequra-checkout .widget-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--gray-700, #334155);
+}
+
+sequra-checkout .widget-toggle input[type="checkbox"] {
+  accent-color: var(--sequra-primary, #00b4a6);
+  width: 16px;
+  height: 16px;
+  margin: 0;
+}
+
+/* Per-method widget block */
+sequra-checkout .payment-method-block {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-right: 1rem;
+  border: 2px solid var(--gray-200, #e2e8f0);
+  border-radius: var(--border-radius, 8px);
+  background: white;
+  transition: all 0.2s;
+}
+
+sequra-checkout .payment-method-block:hover {
+  border-color: var(--gray-300, #d1d5db);
+}
+
+sequra-checkout .payment-method-block:has(input:checked) {
+  border-color: var(--sequra-primary, #00b4a6);
+  background: rgba($sq-color--primary, 0.05);
+}
+
+sequra-checkout .payment-method-block .shipping-option {
+  flex: 1;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+
+sequra-checkout .payment-method-block .shipping-option:hover {
+  border-color: transparent;
+}
+
+sequra-checkout .payment-method-widgets {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+  flex-shrink: 0;
+  text-align: right;
+  min-width: 120px;
+}
+
+sequra-checkout .payment-method-widgets .sequra-educational-popup {
+  display: block;
+  cursor: pointer;
+  color: var(--sequra-primary, #00b4a6);
+  font-size: var(--font-size-sm, 0.875rem);
+}
+
+sequra-checkout .checkout-content {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+sequra-checkout .checkout-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+sequra-checkout .checkout-right {
+  position: sticky;
+  top: 2rem;
+  align-self: start;
+}
+
+sequra-checkout .checkout-section {
+  background: var(--gray-50, #f8fafc);
+  border: 2px solid var(--gray-200, #e2e8f0);
+  border-radius: var(--border-radius, 8px);
+  padding: 1.5rem;
+}
+
+sequra-checkout .checkout-section h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--gray-900, #111827);
+}
+
+/* Step indicator */
+sequra-checkout .step-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+sequra-checkout .step {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+sequra-checkout .step-number {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: var(--gray-200, #e2e8f0);
+  color: var(--gray-500, #64748b);
+  transition: all 0.3s ease;
+}
+
+sequra-checkout .step-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--gray-400, #94a3b8);
+  transition: color 0.3s ease;
+}
+
+sequra-checkout .step-active .step-number {
+  background: var(--sequra-primary, #00b4a6);
+  color: white;
+}
+
+sequra-checkout .step-active .step-label {
+  color: var(--gray-900, #0f172a);
+}
+
+sequra-checkout .step-completed .step-number {
+  background: var(--sequra-primary, #00b4a6);
+  color: white;
+}
+
+sequra-checkout .step-completed .step-label {
+  color: var(--gray-600, #475569);
+}
+
+sequra-checkout .step-connector {
+  width: 40px;
+  height: 2px;
+  background: var(--gray-200, #e2e8f0);
+  margin: 0 0.5rem;
+  transition: background 0.3s ease;
+}
+
+sequra-checkout .step-connector.completed,
+sequra-checkout .step-connector.active {
+  background: var(--sequra-primary, #00b4a6);
+}
+
+/* Address section header (title + edit btn) */
+sequra-checkout .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+sequra-checkout .section-header h3 {
+  margin: 0;
+}
+
+/* Address summary (read-only) */
+sequra-checkout .address-summary {
+  background: white;
+  border: 1px solid var(--gray-200, #e2e8f0);
+  border-radius: var(--border-radius, 8px);
+  padding: 1rem 1.25rem;
+}
+
+sequra-checkout .address-summary-name {
+  font-weight: 600;
+  color: var(--gray-900, #0f172a);
+  font-size: 0.95rem;
+  margin-bottom: 0.35rem;
+}
+
+sequra-checkout .address-summary-detail {
+  color: var(--gray-500, #64748b);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+/* Address buttons */
+sequra-checkout .save-address-btn {
+  padding: 0.75rem 1.5rem;
+  margin-top: 1rem;
+  background: var(--sequra-primary, #00b4a6);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius, 8px);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+
+sequra-checkout .save-address-btn:hover:not(:disabled) {
+  background: var(--sequra-primary-dark, #00a094);
+}
+
+sequra-checkout .save-address-btn:disabled {
+  background: var(--gray-300, #cbd5e1);
+  cursor: not-allowed;
+}
+
+sequra-checkout .edit-address-btn {
+  padding: 0.4rem 0.8rem;
+  background: none;
+  border: 1px solid var(--gray-300, #d1d5db);
+  border-radius: var(--border-radius, 8px);
+  color: var(--gray-700, #374151);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+sequra-checkout .edit-address-btn:hover {
+  border-color: var(--sequra-primary, #00b4a6);
+  color: var(--sequra-primary, #00b4a6);
+}
+
+/* Address form */
+sequra-checkout .address-form .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+sequra-checkout .form-field {
+  margin-bottom: 1rem;
+}
+
+sequra-checkout .form-field:last-child {
+  margin-bottom: 0;
+}
+
+sequra-checkout .form-field label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--gray-700, #374151);
+  font-size: 0.9rem;
+}
+
+sequra-checkout .form-field input,
+sequra-checkout .form-field select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--gray-300, #d1d5db);
+  border-radius: var(--border-radius, 8px);
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+sequra-checkout .form-field select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23697888' d='M1.41 0L6 4.58 10.59 0 12 1.41l-6 6-6-6z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  padding-right: 2.5rem;
+}
+
+sequra-checkout .form-field input:focus,
+sequra-checkout .form-field select:focus {
+  outline: none;
+  border-color: var(--sequra-primary, #00b4a6);
+  box-shadow: 0 0 0 3px rgba($sq-color--primary, 0.1);
+}
+
+/* Shipping options */
+sequra-checkout .shipping-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+sequra-checkout .shipping-option {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border: 2px solid var(--gray-200, #e2e8f0);
+  border-radius: var(--border-radius, 8px);
+  cursor: pointer;
+  transition: all 0.2s;
+  background: white;
+}
+
+sequra-checkout .shipping-option:hover {
+  border-color: var(--gray-300, #d1d5db);
+}
+
+sequra-checkout .shipping-option:has(input:checked) {
+  border-color: var(--sequra-primary, #00b4a6);
+  background: rgba($sq-color--primary, 0.05);
+}
+
+sequra-checkout .shipping-option input[type="radio"] {
+  margin: 0;
+  width: auto;
+}
+
+sequra-checkout .shipping-option .payment-svg-icon {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+sequra-checkout .shipping-details {
+  flex: 1;
+}
+
+sequra-checkout .shipping-name {
+  font-weight: 600;
+  color: var(--gray-900, #111827);
+}
+
+sequra-checkout .shipping-time {
+  font-size: 0.9rem;
+  color: var(--gray-600, #4b5563);
+}
+
+sequra-checkout .shipping-price {
+  font-weight: 600;
+  color: var(--gray-900, #111827);
+}
+
+/* Discount (inside order summary) */
+sequra-checkout .discount-section {
+  border-top: 1px solid var(--gray-200, #e2e8f0);
+  margin-top: 1rem;
+  padding-top: 1rem;
+}
+
+sequra-checkout .discount-section input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--gray-300, #cbd5e1);
+  border-radius: var(--border-radius, 8px);
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+sequra-checkout .discount-section .apply-discount-btn {
+  width: 100%;
+}
+
+sequra-checkout .discount-input-wrapper {
+  position: relative;
+}
+
+sequra-checkout .discount-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--gray-800, #1e293b);
+  color: white;
+  font-size: 0.8rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10;
+}
+
+sequra-checkout .discount-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--gray-800, #1e293b);
+}
+
+sequra-checkout .discount-input-wrapper:hover .discount-tooltip,
+sequra-checkout .discount-input-wrapper:focus-within .discount-tooltip {
+  display: block;
+}
+
+sequra-checkout .discount-input-group {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+sequra-checkout .discount-input-group input {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid var(--gray-300, #d1d5db);
+  border-radius: var(--border-radius, 8px);
+  font-size: 1rem;
+}
+
+sequra-checkout .apply-discount-btn {
+  padding: 0.75rem 1.5rem;
+  background: var(--sequra-primary, #00b4a6);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius, 8px);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+
+sequra-checkout .apply-discount-btn:hover {
+  background: var(--sequra-primary-dark, #00a094);
+}
+
+sequra-checkout .discount-applied {
+  color: var(--sequra-success);
+  font-weight: 500;
+  padding: 0.5rem;
+  background: rgba($sq-color-green--40, 0.1);
+  border-radius: var(--border-radius, 8px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+sequra-checkout .remove-discount-btn {
+  background: none;
+  border: 1px solid var(--sequra-success);
+  color: var(--sequra-success);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+sequra-checkout .remove-discount-btn:hover {
+  background: var(--sequra-success);
+  color: white;
+}
+
+/* Order summary */
+sequra-checkout .order-summary {
+  background: white;
+  border: 1px solid var(--gray-200, #e2e8f0);
+  border-radius: var(--border-radius-lg, 12px);
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Item list */
+sequra-checkout .item-list {
+  margin: 1rem 0;
+}
+
+sequra-checkout .item-list-entry {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--gray-200, #e2e8f0);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+sequra-checkout .item-list-entry:last-child {
+  border-bottom: none;
+}
+
+sequra-checkout .item-list-entry img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: var(--border-radius, 8px);
+}
+
+sequra-checkout .item-list-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+sequra-checkout .item-list-name {
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+sequra-checkout .item-list-qty {
+  font-size: 0.875rem;
+  color: var(--gray-600, #475569);
+}
+
+sequra-checkout .item-list-price {
+  font-weight: 600;
+}
+
+/* Item list compact (thank-you pages) */
+sequra-checkout .item-list--compact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 0 0 1rem 0;
+}
+
+sequra-checkout .item-list--compact .item-list-entry {
+  padding: 0;
+  border-bottom: none;
+  gap: 0.75rem;
+}
+
+sequra-checkout .item-list--compact .item-list-entry img {
+  width: 44px;
+  height: 44px;
+  background: var(--gray-100, #f1f5f9);
+}
+
+sequra-checkout .item-list--compact .item-list-info {
+  display: flex;
+  flex-direction: column;
+}
+
+sequra-checkout .item-list--compact .item-list-name {
+  font-size: 0.875rem;
+  color: var(--gray-800, #1e293b);
+  margin-bottom: 0;
+}
+
+sequra-checkout .item-list--compact .item-list-qty {
+  font-size: 0.8rem;
+  color: var(--gray-400, #94a3b8);
+}
+
+sequra-checkout .item-list--compact .item-list-price {
+  font-size: 0.9rem;
+  color: var(--gray-800, #1e293b);
+}
+
+/* Order totals */
+sequra-checkout .order-totals {
+  border-top: 1px solid var(--gray-200, #e2e8f0);
+  margin-top: 1rem;
+  padding-top: 1rem;
+}
+
+sequra-checkout .order-totals-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+sequra-checkout .order-totals-row.discount {
+  color: var(--sequra-success);
+}
+
+sequra-checkout .order-totals-row.final {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--gray-200, #e2e8f0);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--gray-900, #111827);
+}
+
+/* Order totals compact (thank-you pages) */
+sequra-checkout .order-totals--compact {
+  padding-top: 0.75rem;
+  margin-top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+sequra-checkout .order-totals--compact .order-totals-row {
+  margin-bottom: 0;
+  font-size: 0.875rem;
+  color: var(--gray-600, #475569);
+}
+
+sequra-checkout .order-totals--compact .order-totals-row.discount {
+  color: var(--sequra-accent, #ff6b6b);
+}
+
+sequra-checkout .order-totals--compact .order-totals-row.final {
+  font-size: 1rem;
+  color: var(--gray-900, #0f172a);
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--gray-200, #e2e8f0);
+  margin-top: 0.25rem;
+}
+
+/* Payment methods */
+sequra-checkout .sequra-options {
+  margin: 0;
+}
+
+sequra-checkout .payment-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+sequra-checkout .payment-option {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-bottom: 1px solid var(--gray-200, #e2e8f0);
+  cursor: pointer;
+  transition: all 0.2s;
+  background: white;
+}
+
+sequra-checkout .payment-option:first-child {
+  border-top: 1px solid var(--gray-200, #e2e8f0);
+}
+
+sequra-checkout .payment-option:hover {
+  background: rgba($sq-color--primary, 0.02);
+}
+
+sequra-checkout .payment-option input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--sequra-primary, #00b4a6);
+}
+
+sequra-checkout .sequra-logo {
+  padding: 0.35rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+sequra-checkout .sequra-logo-green {
+  background: var(--sequra-primary, #00b4a6);
+  color: white;
+}
+
+sequra-checkout .sequra-logo-dark {
+  background: #{$sq-color--sequra-black};
+  color: white;
+}
+
+sequra-checkout .sequra-text {
+  font-family: inherit;
+  letter-spacing: -0.5px;
+}
+
+sequra-checkout .sequra-q {
+  font-weight: 700;
+}
+
+sequra-checkout .payment-text {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--gray-700, #374151);
+}
+
+sequra-checkout .payment-method-name {
+  font-weight: 500;
+  display: block;
+}
+
+sequra-checkout .payment-cost {
+  font-size: 0.8rem;
+  color: var(--gray-500, #64748b);
+  display: block;
+}
+
+sequra-checkout .payment-description {
+  font-size: 0.8rem;
+  color: var(--gray-600, #475569);
+  display: block;
+  margin-top: 2px;
+}
+
+sequra-checkout .payment-svg-icon {
+  width: 24px;
+  height: 24px;
+}
+
+sequra-checkout .payment-loading {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--gray-500, #64748b);
+  font-size: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+sequra-checkout .payment-loading .payment-spinner {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border: 3px solid var(--gray-200, #e2e8f0);
+  border-top-color: var(--sequra-primary, #00b4a6);
+  border-radius: 50%;
+  animation: btn-spin 0.6s linear infinite;
+}
+
+sequra-checkout .payment-error {
+  padding: 0.75rem;
+  background: rgba($sq-color--danger, 0.05);
+  border: 1px solid rgba($sq-color--danger, 0.3);
+  border-radius: var(--border-radius, 8px);
+  color: #{$sq-color--red-60};
+  font-size: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+sequra-checkout .payment-no-methods {
+  padding: 0.75rem;
+  background: var(--gray-50, #f8fafc);
+  border: 1px solid var(--gray-200, #e2e8f0);
+  border-radius: var(--border-radius, 8px);
+  color: var(--gray-600, #475569);
+  font-size: 0.85rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+sequra-checkout .retry-btn {
+  padding: 0.4rem 0.8rem;
+  background: var(--sequra-primary, #00b4a6);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius, 8px);
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+sequra-checkout .retry-btn:hover {
+  background: var(--sequra-primary-dark, #00a094);
+}
+
+/* Complete order button */
+sequra-checkout .complete-order-btn {
+  width: 100%;
+  background: var(--sequra-primary, #00b4a6);
+  color: white;
+  border: none;
+  padding: 1rem;
+  border-radius: var(--border-radius, 8px);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 1rem;
+}
+
+sequra-checkout .complete-order-btn:hover:not(:disabled) {
+  background: var(--sequra-primary-dark, #00a094);
+  transform: translateY(-1px);
+}
+
+sequra-checkout .complete-order-btn:disabled {
+  background: var(--gray-300, #cbd5e1);
+  cursor: not-allowed;
+}
+
+/* ═══════════════════════════════════════════
+   Thank You Page
+   ═══════════════════════════════════════════ */
+
+sequra-checkout .thank-you-page {
+  max-width: 900px;
+  padding: 2rem 1.5rem 3rem;
+}
+
+/* Hero / Header */
+sequra-checkout .thank-you-hero {
+  text-align: center;
+  padding: 2rem 0 2.5rem;
+}
+
+sequra-checkout .thank-you-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  color: var(--sequra-primary, #00b4a6);
+  margin-bottom: 1.25rem;
+}
+
+sequra-checkout .thank-you-check-svg {
+  width: 72px;
+  height: 72px;
+  animation: thank-you-draw 0.6s ease-out forwards;
+}
+
+sequra-checkout .thank-you-check-svg circle {
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  animation: thank-you-circle 0.6s ease-out forwards;
+}
+
+sequra-checkout .thank-you-check-svg path {
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: thank-you-tick 0.4s 0.4s ease-out forwards;
+}
+
+@keyframes thank-you-circle {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes thank-you-tick {
+  to { stroke-dashoffset: 0; }
+}
+
+sequra-checkout .thank-you-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--gray-900, #0f172a);
+  margin: 0 0 0.5rem;
+}
+
+sequra-checkout .thank-you-subtitle {
+  font-size: 1.05rem;
+  color: var(--gray-500, #64748b);
+  margin: 0;
+}
+
+/* Two-column layout */
+sequra-checkout .thank-you-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* Cards */
+sequra-checkout .thank-you-card {
+  background: var(--white, #fff);
+  border: 1px solid var(--gray-200, #e2e8f0);
+  border-radius: var(--border-radius-lg, 12px);
+  padding: 1.25rem 1.5rem;
+}
+
+sequra-checkout .thank-you-card h4 {
+  margin: 0 0 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--gray-800, #1e293b);
+}
+
+/* Order number */
+sequra-checkout .thank-you-order-number {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+sequra-checkout .thank-you-label {
+  font-size: 0.875rem;
+  color: var(--gray-500, #64748b);
+}
+
+sequra-checkout .thank-you-value {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--gray-900, #0f172a);
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.5px;
+}
+
+/* Email notice */
+sequra-checkout .thank-you-email-notice {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--gray-600, #475569);
+  line-height: 1.5;
+}
+
+sequra-checkout .thank-you-email-notice strong {
+  color: var(--gray-900, #0f172a);
+}
+
+/* Order detail rows */
+sequra-checkout .thank-you-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 0;
+  font-size: 0.9rem;
+  color: var(--gray-800, #1e293b);
+}
+
+sequra-checkout .thank-you-detail-row:not(:last-child) {
+  border-bottom: 1px solid var(--gray-100, #f1f5f9);
+}
+
+sequra-checkout .thank-you-detail-row .thank-you-label {
+  font-weight: 400;
+}
+
+/* Order summary card */
+sequra-checkout .thank-you-summary {
+  height: fit-content;
+}
+
+
+/* Actions */
+sequra-checkout .thank-you-actions {
+  text-align: center;
+}
+
+sequra-checkout .thank-you-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 2.5rem;
+  background: var(--sequra-primary, #00b4a6);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius, 8px);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+sequra-checkout .thank-you-btn-primary:hover {
+  background: var(--sequra-primary-dark, #00a094);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba($sq-color--primary, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  sequra-checkout .thank-you-content {
+    grid-template-columns: 1fr;
+  }
+
+  sequra-checkout .thank-you-title {
+    font-size: 1.4rem;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   Pending Payment Confirmation Page
+   ═══════════════════════════════════════════ */
+
+sequra-checkout .pending-hero {
+  text-align: center;
+  padding: 2rem 0 2.5rem;
+}
+
+sequra-checkout .pending-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  color: #{$sq-color--warning};
+  margin-bottom: 1.25rem;
+}
+
+sequra-checkout .pending-icon-svg {
+  width: 72px;
+  height: 72px;
+  animation: pending-pulse 2s ease-in-out infinite;
+}
+
+@keyframes pending-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.05); }
+}
+
+sequra-checkout .pending-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+sequra-checkout .check-status-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 2.5rem;
+  background: #{$sq-color--warning};
+  color: white;
+  border: none;
+  border-radius: var(--border-radius, 8px);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+sequra-checkout .check-status-btn:hover:not(:disabled) {
+  background: #{$sq-color--warning-dark};
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba($sq-color--warning, 0.3);
+}
+
+sequra-checkout .check-status-btn:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+sequra-checkout .pending-secondary-btn {
+  background: transparent;
+  color: var(--gray-600, #475569);
+  border: 1px solid var(--gray-300, #cbd5e1);
+}
+
+sequra-checkout .pending-secondary-btn:hover {
+  background: var(--gray-50, #f8fafc);
+  color: var(--gray-800, #1e293b);
+  border-color: var(--gray-400, #94a3b8);
+  box-shadow: none;
+  transform: translateY(-1px);
+}
+
+sequra-checkout .btn-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: btn-spin 0.6s linear infinite;
+}
+
+@keyframes btn-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  sequra-checkout .pending-actions {
+    flex-direction: column;
+  }
+
+  sequra-checkout .check-status-btn,
+  sequra-checkout .pending-secondary-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  sequra-checkout .notification {
+    left: 1rem;
+    right: 1rem;
+    top: 1rem;
+  }
+
+  sequra-checkout .checkout-content {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  sequra-checkout .checkout-right {
+    position: static;
+  }
+
+  sequra-checkout .address-form .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  sequra-checkout .shipping-option {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  sequra-checkout .discount-input-group {
+    flex-direction: column;
+  }
+}

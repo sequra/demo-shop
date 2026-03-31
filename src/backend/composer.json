@@ -1,0 +1,25 @@
+{
+    "name": "sequra/demo-backend",
+    "type": "project",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=8.4",
+        "sequra/integration-core": "^4.1.0",
+        "ext-json": "*"
+    },
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/sequra/integration-core.git"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "SeQura\\Demo\\": "src/"
+        }
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^4.0"
+    }
+}
