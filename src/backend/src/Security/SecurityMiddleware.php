@@ -54,6 +54,11 @@ final class SecurityMiddleware
             return $originResponse;
         }
 
+        // GET requests are read-only — CSRF does not apply (cross-origin reads are blocked by CORS)
+        if ($method === 'GET') {
+            return null;
+        }
+
         // CSRF token validation
         return self::validateCsrf($request);
     }

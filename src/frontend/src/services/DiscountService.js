@@ -1,17 +1,18 @@
 export class DiscountService {
   applyDiscount(code, subtotal) {
-    const normalized = code.toLowerCase();
+    const normalized = code.toLowerCase().trim();
+
+    const sequraMatch = normalized.match(/^sequra-(\d+)$/);
+    if (sequraMatch) {
+      const percent = parseInt(sequraMatch[1], 10);
+      if (percent < 1 || percent > 99) {
+        return { valid: false, discountAmount: 0, freeShipping: false, messageKey: 'discount.invalid', messageParams: {}, type: 'error' };
+      }
+      const amount = subtotal * (percent / 100);
+      return { valid: true, discountAmount: amount, freeShipping: false, messageKey: 'discount.off', messageParams: { percent: String(percent) }, type: 'success' };
+    }
 
     switch (normalized) {
-      case 'sequrademodiscount':
-      case 'save10': {
-        const amount = subtotal * 0.1;
-        return { valid: true, discountAmount: amount, freeShipping: false, messageKey: 'discount.off', messageParams: { percent: '10' }, type: 'success' };
-      }
-      case 'save20': {
-        const amount = subtotal * 0.2;
-        return { valid: true, discountAmount: amount, freeShipping: false, messageKey: 'discount.off', messageParams: { percent: '20' }, type: 'success' };
-      }
       case 'freeship':
         return { valid: true, discountAmount: 0, freeShipping: true, messageKey: 'discount.freeShipping', messageParams: {}, type: 'success' };
       case 'welcome':

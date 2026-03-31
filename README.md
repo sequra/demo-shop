@@ -120,7 +120,7 @@ The frontend is a set of Lit web components that render the checkout UI. Everyth
 | **I18nService** | Internationalization. Supports 4 languages (en, es, fr, de) and 4 currencies (EUR, GBP, USD, CHF). Formats prices with locale-appropriate separators. Persists preferences in localStorage. |
 | **OrderBuilderService** | Transforms frontend state into the SeQura API payload format (snake_case, country codes, currency, cart items). |
 | **ProductService** | Loads the mock product catalog and applies translations. |
-| **DiscountService** | Validates hardcoded discount codes (SUMMER20, CODE20OFF, FREESHIPPING) and calculates discount amounts. |
+| **DiscountService** | Validates discount codes and calculates discount amounts. Accepts the dynamic pattern `SEQURA-XX` (e.g. `SEQURA-20` for 20% off, integer 1–99, case-insensitive) plus two special codes: `freeship` (free shipping) and `welcome` ($15 off). |
 | **StorageService** | localStorage wrapper with namespaced keys. |
 
 **Models:**

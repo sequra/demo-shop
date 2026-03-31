@@ -94,6 +94,28 @@ sequra-checkout .checkout-header h2 {
   margin: 0;
 }
 
+sequra-checkout .checkout-header__github-link {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--sq-color-primary, #333);
+  text-decoration: none;
+  opacity: 0.7;
+
+  &:hover {
+    opacity: 1;
+    text-decoration: underline;
+  }
+}
+
+sequra-checkout .checkout-header__github-icon {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
 /* Floating settings button & panel */
 sequra-checkout .floating-settings-container {
   position: fixed;

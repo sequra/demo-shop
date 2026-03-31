@@ -5,3 +5,5 @@ src/backend/vendor/
 src/backend/public/dist/
 src/backend/data
 src/backend/docker-compose.override.yml
+CLAUDE.md
+.claude/
