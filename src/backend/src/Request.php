@@ -12,14 +12,7 @@ namespace SeQura\Demo;
 final class Request
 {
     /** @var array<string, string> */
-    public array $params = [] {
-        get {
-            return $this->params;
-        }
-        set {
-            $this->params = $value;
-        }
-    }
+    public array $params = [];
 
     /**
      * @param string $method HTTP method (GET, POST, etc.).
