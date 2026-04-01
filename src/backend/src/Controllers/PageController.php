@@ -15,6 +15,8 @@ use SeQura\Demo\Response;
  */
 final readonly class PageController
 {
+    use SanitizesIdentifiers;
+
     /**
      * @param CredentialsService $credentialsService
      */
@@ -59,32 +61,10 @@ final readonly class PageController
 
     private function setMerchantContextFromRequest(Request $request): void
     {
-        $merchantRef = $this->sanitizeIdentifier($request->getQueryParam('merchant_ref'));
-        $assetsKey = $this->sanitizeIdentifier($request->getQueryParam('assets_key'));
+        $merchantRef = self::sanitizeIdentifier($request->getQueryParam('merchant_ref'));
+        $assetsKey = self::sanitizeIdentifier($request->getQueryParam('assets_key'));
         $merchantDto = $merchantRef && $assetsKey ? new MerchantDataDto($merchantRef, $assetsKey) : null;
         MerchantContext::setMerchant($merchantDto);
-    }
-
-    /**
-     * Sanitize an identifier parameter (merchant_ref / assets_key).
-     *
-     * Trims whitespace and strips any character that is not alphanumeric,
-     * a hyphen, an underscore, or a dot. Returns null when the input is null
-     * or when the result after sanitization is empty.
-     *
-     * @param string|null $value Raw query parameter value.
-     *
-     * @return string|null
-     */
-    private function sanitizeIdentifier(?string $value): ?string
-    {
-        if ($value === null) {
-            return null;
-        }
-
-        $sanitized = preg_replace('/[^a-zA-Z0-9_\-.]/', '', trim($value));
-
-        return ($sanitized === '' || $sanitized === null) ? null : $sanitized;
     }
 
     /**

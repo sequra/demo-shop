@@ -23,12 +23,13 @@ use Throwable;
  */
 final readonly class CheckoutController
 {
+    use SanitizesIdentifiers;
     private const string STORE_ID = 'demo';
 
     /**
      * @param CredentialsService $credentialsService
      * @param DemoSeQuraOrderRepository $orderRepository
-     * @param MerchantDataProviderInterface $merchantDataProvider
+     * @param MerchantOrderRequestBuilder $merchantOrderRequestBuilder
      */
     public function __construct(
         private CredentialsService $credentialsService,
@@ -66,8 +67,12 @@ final readonly class CheckoutController
         // Fall back to payload values when the session tenant is absent (e.g. the
         // session was cleared by another tab navigating without the tenant params).
         if ($merchantData === null && !empty($payload['merchant_ref']) && !empty($payload['assets_key'])) {
-            $merchantData = new MerchantDataDto($payload['merchant_ref'], $payload['assets_key']);
-            MerchantContext::setMerchant($merchantData);
+            $merchantRef = self::sanitizeIdentifier($payload['merchant_ref']);
+            $assetsKey = self::sanitizeIdentifier($payload['assets_key']);
+            if ($merchantRef && $assetsKey) {
+                $merchantData = new MerchantDataDto($merchantRef, $assetsKey);
+                MerchantContext::setMerchant($merchantData);
+            }
         }
 
         try {
@@ -151,4 +156,5 @@ final readonly class CheckoutController
             return Response::json(['error' => $e->getMessage()], 500);
         }
     }
+
 }
