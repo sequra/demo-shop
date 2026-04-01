@@ -98,9 +98,9 @@ final class Bootstrap
 
         ServiceRegister::registerService(
             MerchantDataProviderInterface::class,
-            static function () {
-                return new DemoMerchantDataProvider();
-            }
+            static fn() => new DemoMerchantDataProvider(
+                ServiceRegister::getService(SeQuraOrderRepositoryInterface::class)
+            )
         );
 
         ServiceRegister::registerService(

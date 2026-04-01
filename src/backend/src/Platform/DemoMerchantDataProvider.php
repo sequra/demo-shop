@@ -7,6 +7,7 @@ namespace SeQura\Demo\Platform;
 use SeQura\Core\BusinessLogic\Domain\Integration\Order\MerchantDataProviderInterface;
 use SeQura\Core\BusinessLogic\Domain\Order\Models\OrderRequest\Options;
 use SeQura\Demo\Config;
+use SeQura\Demo\Repository\DemoSeQuraOrderRepository;
 
 /**
  * Demo implementation of MerchantDataProviderInterface.
@@ -15,6 +16,10 @@ use SeQura\Demo\Config;
  */
 final class DemoMerchantDataProvider implements MerchantDataProviderInterface
 {
+    public function __construct(private readonly DemoSeQuraOrderRepository $orderRepository)
+    {
+    }
+
     /**
      * @inheritDoc
      */
@@ -100,7 +105,9 @@ final class DemoMerchantDataProvider implements MerchantDataProviderInterface
      */
     public function getNotificationParametersForCartId(string $cartId): array
     {
-        return [];
+        $merchantRef = $this->orderRepository->getMerchantRef($cartId);
+
+        return $merchantRef !== null ? ['merchant_ref' => $merchantRef] : [];
     }
 
     /**
@@ -108,6 +115,8 @@ final class DemoMerchantDataProvider implements MerchantDataProviderInterface
      */
     public function getEventsWebhookParametersForCartId(string $cartId): array
     {
-        return [];
+        $merchantRef = $this->orderRepository->getMerchantRef($cartId);
+
+        return $merchantRef !== null ? ['merchant_ref' => $merchantRef] : [];
     }
 }
