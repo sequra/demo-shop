@@ -17,12 +17,18 @@ final class DemoLoggerAdapter implements ShopLoggerAdapter
      */
     public function logMessage(LogData $data): void
     {
+        $context = '';
+        foreach ($data->getContext() as $contextData) {
+            $context .= ' | ' . $contextData->getName() . ': ' . $contextData->getValue();
+        }
+
         error_log(
             sprintf(
-                '[SeQura][%s][%s] %s',
+                '[SeQura][%s][%s] %s%s',
                 $this->levelLabel($data->getLogLevel()),
                 $data->getComponent(),
-                $data->getMessage()
+                $data->getMessage(),
+                $context
             )
         );
     }

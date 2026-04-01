@@ -67,7 +67,18 @@ final class DemoSeQuraOrderRepository implements SeQuraOrderRepositoryInterface
     {
         $all = $this->readAll();
 
-        return isset($all[$cartId]) ? $this->hydrate($all[$cartId]) : null;
+        if (!isset($all[$cartId])) {
+            return null;
+        }
+
+        // An entry created solely by setMerchantContext() contains only
+        // underscore-prefixed tracking keys and no real order data yet.
+        // Attempting to hydrate such an entry would cause a TypeError inside
+        // SeQuraOrder::inflate(), so treat it as "not found".
+        $entry = $all[$cartId];
+        $hasOrderData = !empty(array_filter($entry, static fn($k) => !str_starts_with($k, '_'), ARRAY_FILTER_USE_KEY));
+
+        return $hasOrderData ? $this->hydrate($entry) : null;
     }
 
     /** @inheritDoc
