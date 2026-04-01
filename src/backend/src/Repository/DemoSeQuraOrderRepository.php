@@ -159,6 +159,43 @@ final class DemoSeQuraOrderRepository implements SeQuraOrderRepositoryInterface
         return null;
     }
 
+    /**
+     * Store the merchant reference for a cart, creating the entry if needed.
+     *
+     * Must be called before solicitation so that getNotificationParametersForCartId()
+     * can include the merchant_ref when the integration-core builds the order payload.
+     *
+     * @param string $cartId     The cart identifier.
+     * @param string $merchantRef The merchant reference to associate.
+     *
+     * @return void
+     */
+    public function setMerchantContext(string $cartId, string $merchantRef): void
+    {
+        if ($cartId === '') {
+            return;
+        }
+
+        $all = $this->readAll();
+        $all[$cartId]['_merchant_ref'] = $merchantRef;
+        $this->writeAll($all);
+    }
+
+    /**
+     * Retrieve the merchant reference stored for a cart, or null if absent.
+     *
+     * @param string $cartId The cart identifier.
+     *
+     * @return string|null
+     */
+    public function getMerchantRef(string $cartId): ?string
+    {
+        $all = $this->readAll();
+        $value = $all[$cartId]['_merchant_ref'] ?? null;
+
+        return is_string($value) ? $value : null;
+    }
+
     /** @inheritDoc */
     public function deleteOrder(SeQuraOrder $existingOrder): void
     {
