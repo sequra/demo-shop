@@ -14,6 +14,7 @@ use SeQura\Demo\Response;
 final class WebhookController
 {
     private const string PREFIX = 'm_';
+    private const string STORE_ID = 'demo';
 
     /**
      * Process an IPN webhook request.
@@ -32,11 +33,15 @@ final class WebhookController
             $modifiedPayload[$newKey] = $value;
         }
 
-        if (empty($modifiedPayload['storeId'])) {
+        if (!empty($modifiedPayload['merchant_ref'])) {
+            $storeId = self::STORE_ID;
+        } elseif (!empty($modifiedPayload['storeId'])) {
+            $storeId = $modifiedPayload['storeId'];
+        } else {
             return new Response('Missing storeId', 400);
         }
 
-       $response = WebhookAPI::webhookHandler($modifiedPayload['storeId'])->handleRequest($modifiedPayload);
+        $response = WebhookAPI::webhookHandler($storeId)->handleRequest($modifiedPayload);
 
         return new Response(json_encode($response->toArray()), $response->isSuccessful() ? 200 : 400);
     }
