@@ -15,12 +15,12 @@ class MerchantDataDto
     {
     }
 
-    public function getMerchantId(): ?string
+    public function getMerchantId(): string
     {
         return $this->merchantId;
     }
 
-    public function getAssetsKey(): ?string
+    public function getAssetsKey(): string
     {
         return $this->assetsKey;
     }

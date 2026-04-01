@@ -25,7 +25,7 @@ class CredentialsService extends BaseCredentialsService
     public function getCredentialsByCountryCode(string $countryCode): ?Credentials
     {
         $merchantId = MerchantContext::getMerchant()?->getMerchantId();
-        if($merchantId) {
+        if ($merchantId) {
             // Force using the merchant ID received from the context to fetch credentials.
             return $this->getCredentialsByMerchantId($merchantId);
         }
