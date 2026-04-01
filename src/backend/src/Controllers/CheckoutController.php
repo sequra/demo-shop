@@ -8,6 +8,7 @@ use SeQura\Core\BusinessLogic\CheckoutAPI\CheckoutAPI;
 use SeQura\Core\BusinessLogic\CheckoutAPI\PromotionalWidgets\Requests\PromotionalWidgetsCheckoutRequest;
 use SeQura\Core\BusinessLogic\Domain\Connection\Services\CredentialsService;
 use SeQura\Demo\Builders\DemoCreateOrderRequestBuilder;
+use SeQura\Demo\Repository\DemoSeQuraOrderRepository;
 use SeQura\Demo\Request;
 use SeQura\Demo\Response;
 use Throwable;
@@ -21,13 +22,24 @@ final readonly class CheckoutController
 
     /**
      * @param CredentialsService $credentialsService
+     * @param DemoSeQuraOrderRepository $orderRepository
      */
-    public function __construct(private CredentialsService $credentialsService)
-    {
+    public function __construct(
+        private CredentialsService $credentialsService,
+        private DemoSeQuraOrderRepository $orderRepository
+    ) {
     }
 
     /**
      * Create a solicitation order via the CheckoutAPI.
+     *
+     * When a tenant context is present in the session, the cart is associated
+     * with the merchant reference before the solicitation call so that
+     * getNotificationParametersForCartId() can embed it in the order payload.
+     * The response then carries the tenant's merchant_ref and assets_key.
+     *
+     * Without a tenant context the existing country-code credential lookup is
+     * used unchanged.
      *
      * @param Request $request The incoming HTTP request.
      *
@@ -40,16 +52,29 @@ final readonly class CheckoutController
         unset($orderData['merchant']);
 
         try {
-            $countryCode = $orderData['delivery_address']['country_code'] ?? 'ES';
-
-            $credentials = $this->credentialsService->getCredentialsByCountryCode($countryCode);
-
-            if (!$credentials) {
-                return Response::json(['error' => "No credentials for country: {$countryCode}"], 400);
-            }
-
             if (empty($orderData['cart']['cart_ref'])) {
                 $orderData['cart']['cart_ref'] = 'demo-' . uniqid('', true);
+            }
+
+            $cartId = $orderData['cart']['cart_ref'];
+            $countryCode = $orderData['delivery_address']['country_code'] ?? 'ES';
+            $tenant = $_SESSION['tenant'] ?? null;
+
+            if ($tenant !== null) {
+                // Store cart→merchant mapping BEFORE the solicitation call so
+                // that getNotificationParametersForCartId() returns it in time.
+                $this->orderRepository->setMerchantContext($cartId, $tenant['merchant_ref']);
+                $merchantRef = $tenant['merchant_ref'];
+                $assetKey = $tenant['assets_key'];
+            } else {
+                $credentials = $this->credentialsService->getCredentialsByCountryCode($countryCode);
+
+                if (!$credentials) {
+                    return Response::json(['error' => "No credentials for country: {$countryCode}"], 400);
+                }
+
+                $merchantRef = $credentials->getMerchantId();
+                $assetKey = $credentials->getAssetsKey();
             }
 
             $builder = new DemoCreateOrderRequestBuilder($orderData);
@@ -69,11 +94,11 @@ final readonly class CheckoutController
             $widgetData = $widgetResponse->toArray();
 
             return Response::json([
-                'cartId' => $orderData['cart']['cart_ref'],
+                'cartId' => $cartId,
                 'orderRef' => $responseArray['order']['reference'] ?? '',
                 'paymentMethods' => $responseArray['availablePaymentMethods'],
-                'merchantRef' => $credentials->getMerchantId(),
-                'assetKey' => $credentials->getAssetsKey(),
+                'merchantRef' => $merchantRef,
+                'assetKey' => $assetKey,
                 'scriptUri' => $widgetData['scriptUri'] ?? 'https://sandbox.sequracdn.com/assets/sequra-checkout.min.js',
             ]);
         } catch (Throwable $e) {

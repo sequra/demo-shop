@@ -163,6 +163,11 @@ final class Bootstrap
             static fn() => new DemoSeQuraOrderRepository()
         );
 
+        ServiceRegister::registerService(
+            DemoSeQuraOrderRepository::class,
+            static fn() => ServiceRegister::getService(SeQuraOrderRepositoryInterface::class)
+        );
+
         // --- No-op repos (satisfy constructor injection for unused services) ---
 
         ServiceRegister::registerService(
