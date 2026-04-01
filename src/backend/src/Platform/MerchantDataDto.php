@@ -29,15 +29,16 @@ class MerchantDataDto
     {
         return [
             'merchant_ref' => $this->merchantId,
-            'assets_key'   => $this->assetsKey,
+            'assets_key' => $this->assetsKey,
         ];
     }
 
-    public static function fromArray(array $data): self
+    public static function fromArray(array $data): ?self
     {
-        return new self(
-            merchantId: $data['merchant_ref'] ?? '',
-            assetsKey: $data['assets_key'] ?? '',
-        );
+        if (empty($data['merchant_ref']) || empty($data['assets_key'])) {
+            return null;
+        }
+
+        return new self($data['merchant_ref'], $data['assets_key']);
     }
 }
