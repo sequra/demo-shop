@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace SeQura\Demo\Controllers;
 
 use SeQura\Core\BusinessLogic\Domain\Connection\Services\CredentialsService;
+use SeQura\Demo\Platform\MerchantContext;
+use SeQura\Demo\Platform\MerchantDataDto;
 use SeQura\Demo\Request;
 use SeQura\Demo\Response;
 
@@ -34,35 +36,33 @@ final readonly class PageController
      */
     public function homepage(Request $request): Response
     {
+        $this->setMerchantContextFromRequest($request);
+        return Response::view('checkout', $this->resolveCredentials());
+    }
+
+    private function resolveCredentials(): array
+    {
+        $merchantData = MerchantContext::getMerchant();
+        if ($merchantData !== null) {
+            return [
+                'assetKey' => $merchantData->getAssetsKey(),
+                'merchantRef' => $merchantData->getMerchantId(),
+            ];
+        }
+        $allCredentials = $this->credentialsService->getCredentials();
+        $credentials = !empty($allCredentials) ? $allCredentials[0] : null;
+        return [
+            'assetKey' => $credentials ? $credentials->getAssetsKey() : '',
+            'merchantRef' => null,
+        ];
+    }
+
+    private function setMerchantContextFromRequest(Request $request): void
+    {
         $merchantRef = $this->sanitizeIdentifier($request->getQueryParam('merchant_ref'));
         $assetsKey = $this->sanitizeIdentifier($request->getQueryParam('assets_key'));
-
-        if ($merchantRef !== null && $merchantRef !== '' && $assetsKey !== null && $assetsKey !== '') {
-            $_SESSION['tenant'] = [
-                'merchant_ref' => $merchantRef,
-                'assets_key'   => $assetsKey,
-            ];
-        } else {
-            unset($_SESSION['tenant']);
-        }
-
-        if (!empty($_SESSION['tenant'])) {
-            $resolvedAssetKey = $_SESSION['tenant']['assets_key'];
-            $resolvedMerchantRef = $_SESSION['tenant']['merchant_ref'];
-        } else {
-            $allCredentials = $this->credentialsService->getCredentials();
-            $credentials = !empty($allCredentials) ? $allCredentials[0] : null;
-            $resolvedAssetKey = $credentials ? $credentials->getAssetsKey() : '';
-            $resolvedMerchantRef = null;
-        }
-
-        return Response::view(
-            'checkout',
-            [
-                'assetKey'    => $resolvedAssetKey,
-                'merchantRef' => $resolvedMerchantRef,
-            ]
-        );
+        $merchantDto = $merchantRef && $assetsKey ? new MerchantDataDto($merchantRef, $assetsKey) : null;
+        MerchantContext::setMerchant($merchantDto);
     }
 
     /**

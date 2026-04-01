@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SeQura\Demo;
 
 use SeQura\Core\BusinessLogic\BootstrapComponent;
+use SeQura\Core\BusinessLogic\Domain\Connection\ProxyContracts\ConnectionProxyInterface;
 use SeQura\Core\Infrastructure\Configuration\Configuration;
 use SeQura\Core\Infrastructure\Logger\Interfaces\ShopLoggerAdapter;
 use SeQura\Core\Infrastructure\ServiceRegister;
@@ -37,6 +38,8 @@ use SeQura\Demo\Platform\DemoShopOrderStatuses;
 use SeQura\Demo\Platform\DemoStoreIntegration;
 use SeQura\Core\BusinessLogic\Domain\Deployments\ProxyContracts\DeploymentsProxyInterface;
 use SeQura\Core\BusinessLogic\Domain\Deployments\Services\DeploymentsService;
+use SeQura\Core\BusinessLogic\Domain\Connection\Services\CredentialsService as BaseCredentialsService;
+use SeQura\Demo\Platform\CredentialsService;
 use SeQura\Demo\Repository\DemoConnectionDataRepository;
 use SeQura\Demo\Repository\DemoCountryConfigRepository;
 use SeQura\Demo\Repository\DemoCredentialsRepository;
@@ -137,6 +140,15 @@ final class Bootstrap
         // ---------------------------------------------------------------
 
         // --- File-backed repositories ---
+        ServiceRegister::registerService(
+            BaseCredentialsService::class,
+            static fn() => new CredentialsService(
+                ServiceRegister::getService(ConnectionProxyInterface::class),
+                ServiceRegister::getService(CredentialsRepositoryInterface::class),
+                ServiceRegister::getService(CountryConfigurationRepositoryInterface::class),
+                ServiceRegister::getService(PaymentMethodRepositoryInterface::class)
+            )
+        );
 
         ServiceRegister::registerService(
             ConnectionDataRepositoryInterface::class,

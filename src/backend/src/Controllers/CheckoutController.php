@@ -7,7 +7,12 @@ namespace SeQura\Demo\Controllers;
 use SeQura\Core\BusinessLogic\CheckoutAPI\CheckoutAPI;
 use SeQura\Core\BusinessLogic\CheckoutAPI\PromotionalWidgets\Requests\PromotionalWidgetsCheckoutRequest;
 use SeQura\Core\BusinessLogic\Domain\Connection\Services\CredentialsService;
+use SeQura\Core\BusinessLogic\Domain\Integration\Order\MerchantDataProviderInterface;
+use SeQura\Core\BusinessLogic\Domain\Multistore\StoreContext;
+use SeQura\Core\BusinessLogic\Domain\Order\Builders\MerchantOrderRequestBuilder;
 use SeQura\Demo\Builders\DemoCreateOrderRequestBuilder;
+use SeQura\Demo\Platform\MerchantContext;
+use SeQura\Demo\Platform\MerchantDataDto;
 use SeQura\Demo\Repository\DemoSeQuraOrderRepository;
 use SeQura\Demo\Request;
 use SeQura\Demo\Response;
@@ -23,10 +28,12 @@ final readonly class CheckoutController
     /**
      * @param CredentialsService $credentialsService
      * @param DemoSeQuraOrderRepository $orderRepository
+     * @param MerchantDataProviderInterface $merchantDataProvider
      */
     public function __construct(
         private CredentialsService $credentialsService,
-        private DemoSeQuraOrderRepository $orderRepository
+        private DemoSeQuraOrderRepository $orderRepository,
+        private MerchantOrderRequestBuilder $merchantOrderRequestBuilder
     ) {
     }
 
@@ -49,33 +56,37 @@ final readonly class CheckoutController
     {
         $payload = $request->getBody();
         $orderData = $payload['order'] ?? $payload;
-        unset($orderData['merchant']);
+        if (empty($orderData['cart']['cart_ref'])) {
+            $orderData['cart']['cart_ref'] = 'demo-' . uniqid('', true);
+        }
+        $cartId = $orderData['cart']['cart_ref'];
+        $countryCode = $orderData['delivery_address']['country_code'] ?? 'ES';
+
+        $merchantData = MerchantContext::getMerchant();
+        // Fall back to payload values when the session tenant is absent (e.g. the
+        // session was cleared by another tab navigating without the tenant params).
+        if ($merchantData === null && !empty($payload['merchant_ref']) && !empty($payload['assets_key'])) {
+            $merchantData = new MerchantDataDto($payload['merchant_ref'], $payload['assets_key']);
+            MerchantContext::setMerchant($merchantData);
+        }
 
         try {
-            if (empty($orderData['cart']['cart_ref'])) {
-                $orderData['cart']['cart_ref'] = 'demo-' . uniqid('', true);
-            }
-
-            $cartId = $orderData['cart']['cart_ref'];
-            $countryCode = $orderData['delivery_address']['country_code'] ?? 'ES';
-            $tenant = $_SESSION['tenant'] ?? null;
-
-            if ($tenant !== null) {
+            if ($merchantData !== null) {
                 // Store cart→merchant mapping BEFORE the solicitation call so
                 // that getNotificationParametersForCartId() returns it in time.
-                $this->orderRepository->setMerchantContext($cartId, $tenant['merchant_ref']);
-                $merchantRef = $tenant['merchant_ref'];
-                $assetKey = $tenant['assets_key'];
+                $this->orderRepository->setMerchantContext($cartId, $merchantData->getMerchantId());
             } else {
                 $credentials = $this->credentialsService->getCredentialsByCountryCode($countryCode);
 
                 if (!$credentials) {
                     return Response::json(['error' => "No credentials for country: {$countryCode}"], 400);
                 }
-
-                $merchantRef = $credentials->getMerchantId();
-                $assetKey = $credentials->getAssetsKey();
+                $merchantData = new MerchantDataDto($credentials->getMerchantId(), $credentials->getAssetsKey());
             }
+
+            $orderData['merchant'] = StoreContext::doWithStore(self::STORE_ID, function () use ($countryCode, $cartId) {
+                return $this->merchantOrderRequestBuilder->build($countryCode, $cartId)->toArray();
+            });
 
             $builder = new DemoCreateOrderRequestBuilder($orderData);
             $response = CheckoutAPI::get()->solicitation(self::STORE_ID)->solicitFor($builder);
@@ -97,8 +108,8 @@ final readonly class CheckoutController
                 'cartId' => $cartId,
                 'orderRef' => $responseArray['order']['reference'] ?? '',
                 'paymentMethods' => $responseArray['availablePaymentMethods'],
-                'merchantRef' => $merchantRef,
-                'assetKey' => $assetKey,
+                'merchantRef' => $merchantData->getMerchantId(),
+                'assetKey' => $merchantData->getAssetsKey(),
                 'scriptUri' => $widgetData['scriptUri'] ?? 'https://sandbox.sequracdn.com/assets/sequra-checkout.min.js',
             ]);
         } catch (Throwable $e) {

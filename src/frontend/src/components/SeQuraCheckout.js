@@ -431,6 +431,7 @@ export class SeQuraCheckout extends LitElement {
 
         if (this.merchantRef) {
             payload.merchant_ref = this.merchantRef;
+            payload.assets_key = this.assetKey;
         }
 
         try {
