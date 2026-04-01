@@ -54,6 +54,7 @@ export class SeQuraCheckout extends LitElement {
         super();
 
         this.assetKey = this.getAttribute('asset-key') || '';
+        this.merchantRef = this.getAttribute('merchant-ref') || null;
         this.i18n = new I18nService();
         this.orderBuilder = new OrderBuilderService();
         this.sequraService = new SeQuraService();
@@ -427,6 +428,10 @@ export class SeQuraCheckout extends LitElement {
             i18n: this.i18n,
             cartId: this._cartId
         });
+
+        if (this.merchantRef) {
+            payload.merchant_ref = this.merchantRef;
+        }
 
         try {
             const data = await this.sequraService.startSolicitation(payload);
