@@ -10,7 +10,7 @@ use SeQura\Core\BusinessLogic\Domain\Connection\Services\CredentialsService as B
 /**
  * Class CredentialsService.
  *
- * @package SeQura\Core\BusinessLogic\Domain\Connection\Services
+ * @package SeQura\Demo\Platform
  */
 class CredentialsService extends BaseCredentialsService
 {
