@@ -7,3 +7,4 @@ src/backend/data
 src/backend/docker-compose.override.yml
 CLAUDE.md
 .claude/
+.vscode/
