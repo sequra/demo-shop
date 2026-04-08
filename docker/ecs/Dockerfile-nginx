@@ -1,0 +1,11 @@
+ARG APP_IMAGE
+FROM ${APP_IMAGE} AS app-source
+
+FROM nginx:1.27-alpine
+
+COPY --from=app-source /var/www/html/public/ /var/www/html/public/
+COPY docker/ecs/nginx.conf.template /etc/nginx/templates/default.conf.template
+
+ENV PHP_FPM_HOST=127.0.0.1
+
+EXPOSE 80
