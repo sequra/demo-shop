@@ -28,6 +28,6 @@ services:
     volumes:
       - ./src/frontend:/app
       - ./src/backend/public:/backend-public
-    command: ["npx", "vite", "build", "--watch"]
-    profiles:
-      - dev
+    command: ["sh", "-c", "npm ci && npx vite dev"]
+    ports:
+      - "3000:3000"
