@@ -9,10 +9,7 @@ production-container-push:
 	@docker push $(APP_REGISTRY_URI):$(GIT_COMMIT)
 
 production-nginx-build:
-	docker build \
-		--build-arg APP_IMAGE=sequra-demo-app:$(GIT_COMMIT) \
-		-f docker/ecs/Dockerfile-nginx \
-		-t sequra-demo-nginx:$(GIT_COMMIT) .
+	docker build -f docker/ecs/Dockerfile-nginx -t sequra-demo-nginx:$(GIT_COMMIT) .
 
 production-nginx-push:
 	@docker tag sequra-demo-nginx:$(GIT_COMMIT) $(NGINX_REGISTRY_URI):$(GIT_COMMIT)
