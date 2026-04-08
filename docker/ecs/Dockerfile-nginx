@@ -10,4 +10,4 @@ RUN chown -R nginx:nginx /var/cache/nginx /var/run /var/log/nginx
 
 ENV PHP_FPM_HOST=127.0.0.1
 
-EXPOSE 80
+EXPOSE 8080

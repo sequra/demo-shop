@@ -15,7 +15,7 @@ services:
   nginx:
     image: nginx:1.27-alpine
     ports:
-      - "8081:80"
+      - "8081:8080"
     volumes:
       - ./src/backend/public:/var/www/html/public
       - ./docker/ecs/nginx.conf.template:/etc/nginx/templates/default.conf.template
