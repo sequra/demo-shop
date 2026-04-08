@@ -15,9 +15,10 @@ FROM composer:2 AS composer-builder
 WORKDIR /build
 COPY src/backend/composer.json src/backend/composer.lock ./
 
-RUN --mount=type=secret,id=composer_auth,target=/tmp/composer_auth.json \
-    COMPOSER_AUTH=$(cat /tmp/composer_auth.json) \
-    composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+ARG COMPOSER_AUTH
+ENV COMPOSER_AUTH=${COMPOSER_AUTH}
+
+RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
 
 # Stage 3: Production PHP-FPM image
 FROM php:8.4-fpm AS production
