@@ -74,7 +74,7 @@ final class Config
      */
     public static function get(string $key, ?string $default = null): ?string
     {
-        return self::$values[$key] ?? $default;
+        return self::$values[$key] ?? getenv($key) ?: $default;
     }
 
     /**
