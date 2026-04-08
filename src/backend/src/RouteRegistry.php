@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SeQura\Demo;
 
 use SeQura\Demo\Controllers\CheckoutController;
+use SeQura\Demo\Controllers\HealthController;
 use SeQura\Demo\Controllers\OrderController;
 use SeQura\Demo\Controllers\PageController;
 use SeQura\Demo\Controllers\WebhookController;
@@ -22,6 +23,7 @@ final class RouteRegistry
     public static function initRoutes(): array
     {
         return [
+            Route::get('/healthz', [HealthController::class, 'check']),
             Route::get('/', [PageController::class, 'homepage']),
 
             // Webhook
