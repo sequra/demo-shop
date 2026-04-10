@@ -1,0 +1,45 @@
+# Stage 1: Build frontend assets
+FROM node:22-slim AS frontend-builder
+
+WORKDIR /build/frontend
+COPY src/frontend/package.json src/frontend/package-lock.json ./
+RUN npm ci
+
+COPY src/frontend/ ./
+COPY src/backend/public/ /build/backend/public/
+RUN npm run build
+
+# Stage 2: Install PHP dependencies
+FROM composer:2 AS composer-builder
+
+WORKDIR /build
+COPY src/backend/composer.json src/backend/composer.lock ./
+
+ARG COMPOSER_AUTH
+ENV COMPOSER_AUTH=${COMPOSER_AUTH}
+
+RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+
+# Stage 3: Production PHP-FPM image
+FROM php:8.4-fpm AS production
+
+WORKDIR /var/www/html
+
+COPY src/backend/src/ ./src/
+COPY src/backend/bin/ ./bin/
+COPY src/backend/views/ ./views/
+COPY src/backend/public/ ./public/
+COPY src/backend/composer.json ./
+
+COPY --from=frontend-builder /build/backend/public/dist/ ./public/dist/
+COPY --from=composer-builder /build/vendor/ ./vendor/
+
+RUN mkdir -p /var/www/html/data && chown www-data:www-data /var/www/html/data
+
+COPY docker/common/entrypoint-app.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+EXPOSE 9000
+
+ENTRYPOINT ["entrypoint.sh"]
+CMD ["php-fpm"]
