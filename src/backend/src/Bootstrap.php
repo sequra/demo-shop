@@ -37,6 +37,9 @@ use SeQura\Demo\Platform\DemoShopOrderStatuses;
 use SeQura\Demo\Platform\DemoStoreIntegration;
 use SeQura\Core\BusinessLogic\Domain\Deployments\ProxyContracts\DeploymentsProxyInterface;
 use SeQura\Core\BusinessLogic\Domain\Deployments\Services\DeploymentsService;
+use SeQura\Core\BusinessLogic\Domain\Connection\ProxyContracts\ConnectionProxyInterface;
+use SeQura\Core\BusinessLogic\Domain\Connection\Services\CredentialsService as BaseCredentialsService;
+use SeQura\Demo\Platform\CredentialsService;
 use SeQura\Demo\Repository\DemoConnectionDataRepository;
 use SeQura\Demo\Repository\DemoCountryConfigRepository;
 use SeQura\Demo\Repository\DemoCredentialsRepository;
@@ -247,6 +250,16 @@ final class Bootstrap
                 ServiceRegister::getService(ShopOrderService::class),
                 ServiceRegister::getService(MerchantOrderRequestBuilder::class),
                 ServiceRegister::getService(SeQuraOrderRepositoryInterface::class)
+            )
+        );
+
+        ServiceRegister::registerService(
+            BaseCredentialsService::class,
+            static fn() => new CredentialsService(
+                ServiceRegister::getService(ConnectionProxyInterface::class),
+                ServiceRegister::getService(CredentialsRepositoryInterface::class),
+                ServiceRegister::getService(CountryConfigurationRepositoryInterface::class),
+                ServiceRegister::getService(PaymentMethodRepositoryInterface::class)
             )
         );
     }
