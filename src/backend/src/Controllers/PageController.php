@@ -26,6 +26,12 @@ final readonly class PageController
      */
     public function homepage(): Response
     {
+        if($_REQUEST['merchant_ref'] ?? false) {
+            $_SESSION['merchant_ref'] = preg_replace(
+                '/[^a-zA-Z0-9_\-.]/', '', trim($_REQUEST['merchant_ref'])
+            );
+        }
+
         $allCredentials = $this->credentialsService->getCredentials();
         $credentials = !empty($allCredentials) ? $allCredentials[0] : null;
 
