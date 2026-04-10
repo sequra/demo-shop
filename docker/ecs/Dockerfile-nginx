@@ -1,0 +1,16 @@
+ARG APP_IMAGE
+ARG NGINX_VERSION=1.29.5
+
+FROM ${APP_IMAGE} AS app-source
+
+FROM nginx:${NGINX_VERSION}-alpine
+
+COPY docker/ecs/nginx.conf /etc/nginx/nginx.conf
+
+COPY --from=app-source /var/www/html/public/dist/ /var/www/html/public/dist/
+
+RUN chown -R nginx /etc/nginx/nginx.conf /var/cache/nginx
+
+EXPOSE 8080
+
+USER nginx
