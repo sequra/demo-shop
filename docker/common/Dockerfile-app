@@ -34,8 +34,9 @@ COPY src/backend/composer.json ./
 COPY --from=frontend-builder /build/backend/public/dist/ ./public/dist/
 COPY --from=composer-builder /build/vendor/ ./vendor/
 
-RUN mkdir -p /var/www/html/data && chown www-data:www-data /var/www/html/data
-
+RUN mkdir -p /var/www/html/data && \
+    chown www-data:www-data /var/www/html/data && \
+    cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 COPY docker/common/entrypoint-app.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
