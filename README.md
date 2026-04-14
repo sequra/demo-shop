@@ -18,6 +18,7 @@ A demo application showcasing SeQura's payment integration. It implements a full
     - [Available npm scripts](#available-npm-scripts)
 - [Adding products](#adding-products)
 - [URLs list](#urls-list)
+- [Developer Guide](#developer-guide)
 
 ## 📖 Overview 📖
 
@@ -302,3 +303,7 @@ After making the changes, rebuild the frontend (`npm run build`) or let the Vite
 | Payment form API | `GET http://localhost:8081/api/checkout/form` |
 | Order status API | `GET http://localhost:8081/api/orders/{id}/status` |
 | IPN Webhook | `POST http://localhost:8081/api/ipn` |
+
+## Developer Guide
+
+For a step-by-step tutorial on integrating your e-commerce platform with SeQura using the `sequra/integration-core` PHP library, see the [Developer Guide](src/backend/DEVELOPER_GUIDE.md).
