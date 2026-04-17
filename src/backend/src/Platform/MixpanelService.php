@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SeQura\Demo\Platform;
 
+use SeQura\Demo\Config;
 use SeQura\Demo\Request;
 
 /**
@@ -21,7 +22,7 @@ final class MixpanelService
 
     public function __construct()
     {
-        $this->token = (string) (getenv('MIXPANEL_TOKEN') ?: '');
+        $this->token = (string) Config::get('MIXPANEL_TOKEN', '');
     }
 
     public function trackPageView(Request $request): void
