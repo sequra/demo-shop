@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace SeQura\Demo\Controllers;
 
 use SeQura\Core\BusinessLogic\Domain\Connection\Services\CredentialsService;
+use SeQura\Demo\Platform\MixpanelService;
+use SeQura\Demo\Request;
 use SeQura\Demo\Response;
 
 /**
@@ -14,21 +16,30 @@ final readonly class PageController
 {
     /**
      * @param CredentialsService $credentialsService
+     * @param MixpanelService $mixpanel
      */
-    public function __construct(private CredentialsService $credentialsService)
-    {
+    public function __construct(
+        private CredentialsService $credentialsService,
+        private MixpanelService $mixpanel,
+    ) {
     }
 
     /**
      * Render the homepage (checkout view).
      *
+     * @param Request $request
+     *
      * @return Response
      */
-    public function homepage(): Response
+    public function homepage(Request $request): Response
     {
-        if($_REQUEST['merchant_ref'] ?? false) {
+        $this->mixpanel->trackPageView($request);
+
+        if ($_REQUEST['merchant_ref'] ?? false) {
             $_SESSION['merchant_ref'] = preg_replace(
-                '/[^a-zA-Z0-9_\-.]/', '', trim($_REQUEST['merchant_ref'])
+                '/[^a-zA-Z0-9_\-.]/',
+                '',
+                trim($_REQUEST['merchant_ref'])
             );
         }
 

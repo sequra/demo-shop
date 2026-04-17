@@ -48,6 +48,7 @@ use SeQura\Demo\Repository\DemoSeQuraOrderRepository;
 use SeQura\Demo\Webhook\DemoWebhookHandler;
 use SeQura\Demo\Webhook\DemoWebhookValidator;
 use SeQura\Demo\Services\DemoDeploymentsService;
+use SeQura\Demo\Platform\MixpanelService;
 
 /**
  * Full bootstrap for the SeQura Demo application.
@@ -123,6 +124,11 @@ final class Bootstrap
         ServiceRegister::registerService(
             ShopOrderStatusesServiceInterface::class,
             static fn() => new DemoShopOrderStatuses()
+        );
+
+        ServiceRegister::registerService(
+            MixpanelService::class,
+            static fn() => new MixpanelService()
         );
 
         // ---------------------------------------------------------------
