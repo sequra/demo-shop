@@ -43,6 +43,7 @@ export const translations = {
     'checkout.noCartId': 'No cart ID. Please go back and retry.',
     'checkout.startNewCheckout': 'Start New Checkout',
     'checkout.orderInfo': 'Order Information',
+    'checkout.viewOnGithub': 'View on GitHub',
 
     // Steps
     'steps.address': 'Address',
@@ -182,6 +183,7 @@ export const translations = {
     'checkout.noCartId': 'Sin ID de carrito. Vuelve atrás e inténtalo de nuevo.',
     'checkout.startNewCheckout': 'Iniciar nueva compra',
     'checkout.orderInfo': 'Información del pedido',
+    'checkout.viewOnGithub': 'Ver en GitHub',
 
     // Steps
     'steps.address': 'Dirección',
@@ -329,6 +331,7 @@ export const translations = {
     'checkout.noCartId': 'Pas d\'identifiant de panier. Veuillez revenir en arrière et réessayer.',
     'checkout.startNewCheckout': 'Nouvelle commande',
     'checkout.orderInfo': 'Informations de commande',
+    'checkout.viewOnGithub': 'Voir sur GitHub',
 
     // Steps
     'steps.address': 'Adresse',
@@ -476,6 +479,7 @@ export const translations = {
     'checkout.noCartId': 'Keine Warenkorb-ID. Bitte gehen Sie zurück und versuchen Sie es erneut.',
     'checkout.startNewCheckout': 'Neue Bestellung starten',
     'checkout.orderInfo': 'Bestellinformationen',
+    'checkout.viewOnGithub': 'Auf GitHub ansehen',
 
     // Steps
     'steps.address': 'Adresse',

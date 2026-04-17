@@ -71,8 +71,12 @@ export class SeQuraCheckout extends LitElement {
             this._prevCurrency = this.i18n.currentCurrency;
             this.language = this.i18n.currentLanguage;
             this.currency = this.i18n.currentCurrency;
-            this.requestUpdate('i18n');
+            this.i18n = Object.assign(Object.create(Object.getPrototypeOf(this.i18n)), this.i18n);
+            this.productService.i18n = this.i18n;
             this.items = this.productService.getAllProducts().map(p => new CartItem(p, p.quantity));
+            if (this._paymentMethodsErrorKey) {
+                this.paymentMethodsError = this.i18n.t(this._paymentMethodsErrorKey);
+            }
             this._reloadSequraScript();
             if (currencyChanged) {
                 this._refreshOrderIfNeeded();
@@ -82,6 +86,7 @@ export class SeQuraCheckout extends LitElement {
         this.paymentMethods = [];
         this.paymentMethodsLoading = false;
         this.paymentMethodsError = '';
+        this._paymentMethodsErrorKey = '';
         this.shippingCost = 5.99;
         this.selectedShipping = 'standard';
         this.discountCode = '';
@@ -183,7 +188,7 @@ export class SeQuraCheckout extends LitElement {
                             <svg class="checkout-header__github-icon" viewBox="0 0 16 16" aria-hidden="true" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
                             </svg>
-                            View on GitHub
+                            ${this.i18n.t('checkout.viewOnGithub')}
                         </a>
                     </div>
 
@@ -327,6 +332,7 @@ export class SeQuraCheckout extends LitElement {
     async _onRetrySolicitation() {
         this.paymentMethodsLoading = true;
         this.paymentMethodsError = '';
+        this._paymentMethodsErrorKey = '';
         this.requestUpdate();
         await this._startSolicitation();
     }
@@ -440,6 +446,7 @@ export class SeQuraCheckout extends LitElement {
             this.paymentMethods = data.paymentMethods;
             this.paymentMethodsLoading = false;
             this.paymentMethodsError = '';
+            this._paymentMethodsErrorKey = '';
 
             const productCodes = [...new Set(this.paymentMethods.map(m => m.product))];
             if (productCodes.length > 0) {
@@ -450,13 +457,12 @@ export class SeQuraCheckout extends LitElement {
         } catch (error) {
             this.paymentMethodsLoading = false;
             const msg = error.message || '';
-            if (msg.includes('No credentials')) {
-                this.paymentMethodsError = this.i18n.t('payment.noMethodsForCountry');
-            } else if (msg.includes('currency') || msg.includes('Currency')) {
-                this.paymentMethodsError = this.i18n.t('payment.noMethodsForCurrency');
+            if (msg.includes('currency') || msg.includes('Currency')) {
+                this._paymentMethodsErrorKey = 'payment.noMethodsForCurrency';
             } else {
-                this.paymentMethodsError = this.i18n.t('payment.noMethodsForCountry');
+                this._paymentMethodsErrorKey = 'payment.noMethodsForCountry';
             }
+            this.paymentMethodsError = this.i18n.t(this._paymentMethodsErrorKey);
             return false;
         }
     }
