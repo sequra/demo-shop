@@ -40,16 +40,20 @@ final class MixpanelService
             $origin = $this->classifyOrigin($referer);
             $refererHost = $referer !== '' ? (string) (parse_url($referer, PHP_URL_HOST) ?: '') : '';
 
-            $data = json_encode([[
-                'event' => 'Page Viewed',
-                'properties' => [
-                    'token'        => $this->token,
-                    'distinct_id'  => $this->generateUuid(),
-                    'time'         => time(),
-                    'origin'       => $origin,
-                    'referer_host' => $refererHost,
-                ],
-            ]]);
+            $properties = [
+                'token'        => $this->token,
+                'distinct_id'  => $this->generateUuid(),
+                'time'         => time(),
+                'origin'       => $origin,
+                'referer_host' => $refererHost,
+            ];
+
+            $merchantRef = $request->getQueryParam('merchant_ref');
+            if ($merchantRef !== null && $merchantRef !== '') {
+                $properties['merchant_ref'] = $merchantRef;
+            }
+
+            $data = json_encode([['event' => 'Page Viewed', 'properties' => $properties]]);
 
             if ($data === false) {
                 return;
