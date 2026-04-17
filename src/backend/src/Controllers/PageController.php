@@ -35,9 +35,11 @@ final readonly class PageController
     {
         $this->mixpanel->trackPageView($request);
 
-        if($_REQUEST['merchant_ref'] ?? false) {
+        if ($_REQUEST['merchant_ref'] ?? false) {
             $_SESSION['merchant_ref'] = preg_replace(
-                '/[^a-zA-Z0-9_\-.]/', '', trim($_REQUEST['merchant_ref'])
+                '/[^a-zA-Z0-9_\-.]/',
+                '',
+                trim($_REQUEST['merchant_ref'])
             );
         }
 
