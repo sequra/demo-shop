@@ -23,8 +23,6 @@ use SeQura\Core\BusinessLogic\Domain\Order\RepositoryContracts\SeQuraOrderReposi
 use SeQura\Core\BusinessLogic\Domain\OrderStatusSettings\RepositoryContracts\OrderStatusSettingsRepositoryInterface;
 use SeQura\Core\BusinessLogic\Domain\PaymentMethod\Models\SeQuraPaymentMethod;
 use SeQura\Core\BusinessLogic\Domain\PaymentMethod\RepositoryContracts\PaymentMethodRepositoryInterface;
-use SeQura\Core\BusinessLogic\Domain\StoreIntegration\Models\StoreIntegration;
-use SeQura\Core\BusinessLogic\Domain\StoreIntegration\RepositoryContracts\StoreIntegrationRepositoryInterface;
 use SeQura\Core\BusinessLogic\Webhook\Handler\WebhookHandler;
 use SeQura\Core\BusinessLogic\Webhook\Validator\WebhookValidator;
 use SeQura\Demo\Platform\DemoConfiguration;
@@ -199,24 +197,6 @@ final class Bootstrap
                 }
                 public function deleteOrderStatusMapping(): void
                 {
-                }
-            }
-        );
-
-        ServiceRegister::registerService(
-            StoreIntegrationRepositoryInterface::class,
-            static fn() => new class implements StoreIntegrationRepositoryInterface {
-                public function setStoreIntegration(StoreIntegration $storeIntegration): void
-                {
-                }
-
-                public function deleteStoreIntegration(): void
-                {
-                }
-
-                public function getStoreIntegration(): ?StoreIntegration
-                {
-                    return null;
                 }
             }
         );
