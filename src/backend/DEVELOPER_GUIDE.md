@@ -13,6 +13,7 @@ A step-by-step tutorial for integrating your e-commerce platform with SeQura usi
 - [Step 3: Implement Platform Services](#step-3-implement-platform-services)
   - [3.1 Store Integration Service](#31-store-integration-service)
   - [3.2 Shop Order Statuses Service](#32-shop-order-statuses-service)
+  - [3.3 Store Info Service](#33-store-info-service)
 - [Step 4: Implement Order Management Services](#step-4-implement-order-management-services)
   - [4.1 Merchant Data Provider](#41-merchant-data-provider)
   - [4.2 Order Creation Service](#42-order-creation-service)
@@ -198,6 +199,38 @@ class MyShopOrderStatuses implements ShopOrderStatusesServiceInterface
     }
 }
 ```
+
+### 3.3 Store Info Service
+
+Implement `StoreInfoServiceInterface` to describe the host platform to the core library. The returned `StoreInfo` is forwarded to SeQura (e.g. via the configuration webhook) so the merchant team can see which platform, version, and PHP/OS combination an integration is running on.
+
+**Demo reference** (`src/Platform/DemoStoreInfo.php`):
+
+```php
+use SeQura\Core\BusinessLogic\Domain\Integration\StoreInfo\StoreInfoServiceInterface;
+use SeQura\Core\BusinessLogic\Domain\Stores\Models\StoreInfo;
+
+class MyStoreInfo implements StoreInfoServiceInterface
+{
+    public function getStoreInfo(): StoreInfo
+    {
+        return new StoreInfo(
+            'My Shop',          // store name
+            'https://myshop.com', // store URL
+            'MyPlatform',        // platform identifier
+            '8.2.1',             // platform version
+            '1.0.0',             // plugin/integration version
+            PHP_VERSION,         // PHP version
+            'mysql',             // database engine
+            PHP_OS,              // operating system
+            []                   // additional plugin identifiers
+        );
+    }
+}
+```
+
+> [!NOTE]
+> This service replaces the `StoreIntegrationRepositoryInterface` no-op repository that earlier `^4.x` versions of `integration-core` required. If you are upgrading from `^4.x`, drop your `StoreIntegrationRepositoryInterface` registration and add this service instead.
 
 ## Step 4: Implement Order Management Services
 
@@ -463,9 +496,11 @@ The following repositories are also required. If your integration does not use t
 
 - **`PaymentMethodRepositoryInterface`** — stores cached payment method data
 - **`OrderStatusSettingsRepositoryInterface`** — stores order status mapping configuration
-- **`StoreIntegrationRepositoryInterface`** — stores store integration settings
 
 See `src/Bootstrap.php` for examples of no-op implementations using anonymous classes.
+
+> [!NOTE]
+> `StoreIntegrationRepositoryInterface` was removed in `integration-core` `^5.x`. If you are upgrading from `^4.x`, drop the no-op binding and provide a `StoreInfoServiceInterface` implementation instead (see [3.3](#33-store-info-service)).
 
 ## Step 6: Wire Everything in the Bootstrap
 
@@ -488,6 +523,7 @@ use SeQura\Core\BusinessLogic\Utility\EncryptorInterface;
 use SeQura\Core\BusinessLogic\Domain\Integration\Order\MerchantDataProviderInterface;
 use SeQura\Core\BusinessLogic\Domain\Integration\Order\OrderCreationInterface;
 use SeQura\Core\BusinessLogic\Domain\Integration\ShopOrderStatuses\ShopOrderStatusesServiceInterface;
+use SeQura\Core\BusinessLogic\Domain\Integration\StoreInfo\StoreInfoServiceInterface;
 use SeQura\Core\BusinessLogic\Domain\Integration\StoreIntegration\StoreIntegrationServiceInterface;
 use SeQura\Core\BusinessLogic\Webhook\Services\ShopOrderService;
 // ... other imports
@@ -528,6 +564,11 @@ final class Bootstrap
         ServiceRegister::registerService(
             StoreIntegrationServiceInterface::class,
             static fn() => new MyStoreIntegration()
+        );
+
+        ServiceRegister::registerService(
+            StoreInfoServiceInterface::class,
+            static fn() => new MyStoreInfo()
         );
 
         ServiceRegister::registerService(
@@ -822,6 +863,7 @@ ServiceRegister::registerService(
 ### Platform Integration Layer
 - [ ] Store integration service implementing `StoreIntegrationServiceInterface`
 - [ ] Shop order statuses service implementing `ShopOrderStatusesServiceInterface`
+- [ ] Store info service implementing `StoreInfoServiceInterface`
 
 ### Order Management Layer
 - [ ] Merchant data provider implementing `MerchantDataProviderInterface`
@@ -836,7 +878,6 @@ ServiceRegister::registerService(
 - [ ] SeQura order repository implementing `SeQuraOrderRepositoryInterface`
 - [ ] Payment method repository implementing `PaymentMethodRepositoryInterface`
 - [ ] Order status settings repository implementing `OrderStatusSettingsRepositoryInterface`
-- [ ] Store integration repository implementing `StoreIntegrationRepositoryInterface`
 
 ### Bootstrap
 - [ ] All services registered **before** `BootstrapComponent::init()`
