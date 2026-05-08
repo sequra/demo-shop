@@ -5,7 +5,7 @@
     "prefer-stable": true,
     "require": {
         "php": ">=8.4",
-        "sequra/integration-core": "^4.1.0",
+        "sequra/integration-core": "dev-bugfix/PAR-782-Ignore-Unsupported-Countries-In-Configuration",
         "ext-json": "*"
     },
     "repositories": [

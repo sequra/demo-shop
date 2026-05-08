@@ -4,15 +4,15 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d654479d356a5456bccd633e6d1abe0b",
+    "content-hash": "c29266bc0f20ce7a580ee605b076701f",
     "packages": [
         {
             "name": "sequra/integration-core",
-            "version": "v4.1.0",
+            "version": "dev-bugfix/PAR-782-Ignore-Unsupported-Countries-In-Configuration",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sequra/integration-core.git",
-                "reference": "9b98daf23741c8d1f4c0652f9709d286ac2039cf"
+                "reference": "b3c2d20d634379c1afb4a81048418d02444b81ab"
             },
             "require": {
                 "ext-ctype": "*",
@@ -42,7 +42,7 @@
                 "proprietary"
             ],
             "description": "Core SeQura integration library",
-            "time": "2026-03-10T08:45:58+00:00"
+            "time": "2026-05-07T15:38:30+00:00"
         }
     ],
     "packages-dev": [
@@ -128,7 +128,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {},
+    "stability-flags": {
+        "sequra/integration-core": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
@@ -136,5 +138,5 @@
         "ext-json": "*"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.6.0"
 }
