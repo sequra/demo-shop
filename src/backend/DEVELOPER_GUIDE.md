@@ -229,7 +229,8 @@ class MyStoreInfo implements StoreInfoServiceInterface
 }
 ```
 
-> **Note:** This service replaces the `StoreIntegrationRepositoryInterface` no-op repository that earlier `^4.x` versions of `integration-core` required. If you are upgrading from `^4.x`, drop your `StoreIntegrationRepositoryInterface` registration and add this service instead.
+> [!NOTE]
+> This service replaces the `StoreIntegrationRepositoryInterface` no-op repository that earlier `^4.x` versions of `integration-core` required. If you are upgrading from `^4.x`, drop your `StoreIntegrationRepositoryInterface` registration and add this service instead.
 
 ## Step 4: Implement Order Management Services
 
@@ -498,7 +499,8 @@ The following repositories are also required. If your integration does not use t
 
 See `src/Bootstrap.php` for examples of no-op implementations using anonymous classes.
 
-> **Note:** `StoreIntegrationRepositoryInterface` was removed in `integration-core` `^5.x`. If you are upgrading from `^4.x`, drop the no-op binding and provide a `StoreInfoServiceInterface` implementation instead (see [3.3](#33-store-info-service)).
+> [!NOTE]
+> `StoreIntegrationRepositoryInterface` was removed in `integration-core` `^5.x`. If you are upgrading from `^4.x`, drop the no-op binding and provide a `StoreInfoServiceInterface` implementation instead (see [3.3](#33-store-info-service)).
 
 ## Step 6: Wire Everything in the Bootstrap
 
