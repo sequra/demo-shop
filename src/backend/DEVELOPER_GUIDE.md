@@ -49,10 +49,8 @@ A step-by-step tutorial for integrating your e-commerce platform with SeQura usi
 ## Step 1: Install the Library
 
 ```bash
-composer require sequra/integration-core:^5.1.0
+composer require sequra/integration-core
 ```
-
-The demo currently targets `sequra/integration-core` v5.1.x. The `^5.x` line introduced the `StoreInfoServiceInterface` (see [3.3](#33-store-info-service)) and removed `StoreIntegrationRepositoryInterface` — earlier `^4.x` examples must be adapted accordingly.
 
 ## Step 2: Implement Core Infrastructure Services
 
