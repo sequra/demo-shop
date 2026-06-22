@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+#
+# Shared post-commit hook.
+#
+# setup.sh points core.hooksPath at .githooks, so git no longer runs anything
+# under .git/hooks. Tools that install a *local* post-commit hook there — e.g.
+# graphify's knowledge-graph auto-rebuild (`graphify hook install`) — would be
+# silently shadowed. Chain to that local hook if present so both run. No-op when
+# nothing is installed.
+
+set -uo pipefail
+
+git_dir="$(git rev-parse --git-dir)"
+local_hook="$git_dir/hooks/post-commit"
+
+if [ -x "$local_hook" ]; then
+    exec "$local_hook" "$@"
+fi
