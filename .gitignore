@@ -12,6 +12,3 @@ src/backend/docker-compose.override.yml
 .claude/settings.local.json
 .claude/.cache/
 CLAUDE.local.md
-
-# graphify generated knowledge-graph output
-graphify-out/
