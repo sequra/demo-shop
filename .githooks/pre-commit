@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+#
+# Pre-commit quality gate for the SeQura Checkout Demo.
+# Enabled by ./setup.sh (git config core.hooksPath .githooks).
+# Bypass once with: git commit --no-verify
+#
+# 1. php -l syntax check on staged PHP (host php — fast, no container needed).
+# 2. phpcs (PSR12) on staged backend PHP, only when the Docker container is up.
+#    There is no CI to defer to, but blocking every commit on a stopped
+#    container hurts this demo repo more than it helps — so a down container
+#    skips the style check with a notice instead of failing the commit.
+
+set -uo pipefail
+
+cd "$(git rev-parse --show-toplevel)"
+
+COMPOSE_DIR="src/backend"
+SERVICE="sequra_demo_shop"
+
+# Staged PHP files (added/copied/modified), NUL-delimited to tolerate spaces.
+STAGED_PHP=()
+while IFS= read -r -d '' f; do
+    STAGED_PHP+=("$f")
+done < <(git diff --cached --name-only --diff-filter=ACM -z -- '*.php')
+
+if [ ${#STAGED_PHP[@]} -eq 0 ]; then
+    echo "pre-commit: no staged PHP files — nothing to check."
+    exit 0
+fi
+
+# 1. Host syntax check.
+if command -v php >/dev/null 2>&1; then
+    echo "▶ php -l on ${#STAGED_PHP[@]} staged file(s)..."
+    rc=0
+    for f in "${STAGED_PHP[@]}"; do
+        php -l "$f" >/dev/null || rc=1
+    done
+    [ "$rc" -eq 0 ] || { echo "✗ PHP syntax error in staged files."; exit 1; }
+else
+    echo "pre-commit: php not found on host — skipping syntax check."
+fi
+
+# 2. PSR-12 style check inside the container (optional).
+if ! (cd "$COMPOSE_DIR" && docker compose exec -T "$SERVICE" true) >/dev/null 2>&1; then
+    echo "pre-commit: $SERVICE container is not running — skipping phpcs (run 'docker compose up' to enable)."
+    exit 0
+fi
+
+# Map staged backend paths to container-relative paths (working_dir is src/backend).
+CS_FILES=()
+for f in "${STAGED_PHP[@]}"; do
+    case "$f" in
+        src/backend/*) CS_FILES+=("${f#src/backend/}") ;;
+    esac
+done
+
+if [ ${#CS_FILES[@]} -eq 0 ]; then
+    echo "pre-commit: no staged backend PHP files — skipping phpcs."
+    exit 0
+fi
+
+echo "▶ phpcs --standard=PSR12 on ${#CS_FILES[@]} file(s)..."
+if ! (cd "$COMPOSE_DIR" && docker compose exec -T "$SERVICE" vendor/bin/phpcs --standard=PSR12 "${CS_FILES[@]}"); then
+    echo "✗ phpcs found violations — fix them or commit with --no-verify."
+    exit 1
+fi
+
+echo "✓ Pre-commit checks passed."
