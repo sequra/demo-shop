@@ -34,11 +34,8 @@ docker compose exec sequra_demo_shop php bin/init-data.php
 ```
 Fetches deployments from SeQura API, writes encrypted JSON to `backend/data/`, logs to `/tmp/sequra-demo.log`.
 
-### Production container build (Makefile)
-```bash
-make production-container-build    # Requires AUTH_JSON, APP_REGISTRY_URI, NGINX_REGISTRY_URI
-make production-container-push     # Tags with git commit SHA
-```
+### Production image
+The backend image is built from `src/backend/Dockerfile` (PHP 8.4 + Apache); the local stack uses it via `docker compose up`. No Makefile or registry-push automation is checked into this repo.
 
 No automated test suite. Testing is manual through the browser checkout flow.
 
@@ -94,3 +91,33 @@ Optional: `SEQURA_DATA_DIR` (encrypted file storage path), `VITE_ALLOWED_HOSTS` 
 1. Add image to `src/frontend/public/images/products/`
 2. Add entry in `src/frontend/src/data/products.js`
 3. Add translation keys for all 4 languages in `src/frontend/src/i18n/translations.js`
+
+## Working Principles
+
+Behavioral guidelines (adapted from Andrej Karpathy's CLAUDE.md) to reduce common LLM coding mistakes. They bias toward caution over speed — for trivial tasks, use judgment.
+
+### 1. Think Before Coding
+Don't assume. Don't hide confusion. Surface tradeoffs.
+- State assumptions explicitly. If uncertain, ask.
+- If multiple interpretations exist, present them — don't pick silently.
+- If a simpler approach exists, say so. Push back when warranted.
+- If something is unclear, stop, name what's confusing, and ask.
+
+### 2. Simplicity First
+Minimum code that solves the problem. Nothing speculative.
+- No features beyond what was asked; no abstractions for single-use code.
+- No "flexibility"/"configurability" that wasn't requested; no error handling for impossible scenarios.
+- If you write 200 lines and it could be 50, rewrite it. Ask: "Would a senior engineer say this is overcomplicated?"
+
+### 3. Surgical Changes
+Touch only what you must. Clean up only your own mess.
+- Don't "improve" adjacent code, comments, or formatting; don't refactor what isn't broken.
+- Match existing style even if you'd do it differently.
+- Remove imports/variables/functions that *your* changes orphaned; don't delete pre-existing dead code unless asked — mention it instead.
+- Every changed line should trace directly to the request.
+
+### 4. Goal-Driven Execution
+Define success criteria. Loop until verified.
+- "Add validation" → "write the failing case, then make it pass"; "Fix the bug" → "reproduce it, then make it pass".
+- For multi-step tasks, state a brief plan with a verify check per step.
+- This repo has no automated suite — the verify gate is `phpcs --standard=PSR12` plus the manual browser checkout flow (address → shipping → payment → completion → IPN → thank-you). Confirm both before declaring a change done.
