@@ -39,6 +39,12 @@ The backend image is built from `src/backend/Dockerfile` (PHP 8.4 + Apache); the
 
 No automated test suite. Testing is manual through the browser checkout flow.
 
+### Git hooks (optional, developer-local)
+```bash
+./setup.sh                         # git config core.hooksPath .githooks
+```
+Enables the shared hooks in `.githooks/`: `pre-commit` runs `php -l` on staged PHP plus PSR-12 `phpcs` when the container is up; `pre-push` runs the full `phpcs src/` sweep on PHP-touching pushes. Both skip with a notice when the container is down (there is no CI). `post-commit`/`post-checkout` chain to any local hook (e.g. graphify's graph rebuild). Bypass once with `--no-verify`.
+
 ## Architecture
 
 ### Two-part monorepo
