@@ -14,4 +14,3 @@ chmod +x .githooks/* 2>/dev/null || true
 echo "✓ Git hooks enabled (core.hooksPath=.githooks)."
 echo "  pre-commit:  php -l on staged PHP + scoped phpcs (when the container is up)"
 echo "  pre-push:    full phpcs over src/ on PHP-touching pushes (when the container is up)"
-echo "  post-commit: chains to a local hook if installed (e.g. graphify auto-rebuild)"
