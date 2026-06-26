@@ -8,9 +8,11 @@
 # `git show ":<file>"`, not the working tree, so the verdict matches what is
 # committed). Both tools run through the same backend — the app container if it
 # is up, otherwise a throwaway `php:<ver>-cli` image matching the Dockerfile:
-#   - `php -l` (syntax) — needs only PHP; runs whenever Docker is available.
-#   - `phpcs`  (PSR-12) — needs vendor/, so it runs when the container is up or
-#                         when vendor/ is installed in the mounted tree.
+#   - `php -l`  (syntax)   — needs only PHP; runs whenever Docker is available.
+#   - `phpcbf`  (auto-fix) — applies PSR-12 fixes; re-stages a file only when it
+#                            has no unstaged changes (won't pull in WIP).
+#   - `phpcs`   (PSR-12)   — verifies. phpcbf+phpcs need vendor/, so they run
+#                            when the container is up or vendor/ is in the tree.
 # Missing prerequisites skip with a notice (there is no CI to defer to).
 
 set -uo pipefail
@@ -75,6 +77,20 @@ for f in "${STAGED_PHP[@]}"; do
         continue
     fi
     if [ "$phpcs_ok" -eq 1 ]; then
+        # phpcbf: auto-fix the staged content (it writes the corrected source to
+        # stdout). Re-stage only when the working tree matches the index, so the
+        # fix can't pull in unstaged changes from a partially-staged file.
+        if git diff --quiet -- "$f"; then
+            fixed="$(mktemp)"
+            git show ":$f" | run_php php vendor/bin/phpcbf --standard=PSR12 --stdin-path="$f" - > "$fixed" 2>/dev/null || true
+            if [ -s "$fixed" ] && ! git show ":$f" | cmp -s - "$fixed"; then
+                cp "$fixed" "$f"
+                git add -- "$f"
+                echo "  phpcbf auto-fixed $f (re-staged)"
+            fi
+            rm -f "$fixed"
+        fi
+        # phpcs: verify the (possibly re-staged) staged content.
         git show ":$f" | run_php php vendor/bin/phpcs --standard=PSR12 --stdin-path="$f" - || rc=1
     fi
 done
