@@ -36,7 +36,7 @@ final class WebhookController
             return new Response('Missing storeId', 400);
         }
 
-       $response = WebhookAPI::webhookHandler($modifiedPayload['storeId'])->handleRequest($modifiedPayload);
+        $response = WebhookAPI::webhookHandler($modifiedPayload['storeId'])->handleRequest($modifiedPayload);
 
         return new Response(json_encode($response->toArray()), $response->isSuccessful() ? 200 : 400);
     }
