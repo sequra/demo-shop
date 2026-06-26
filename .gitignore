@@ -5,6 +5,10 @@ src/backend/vendor/
 src/backend/public/dist/
 src/backend/data
 src/backend/docker-compose.override.yml
-CLAUDE.md
-.claude/
 .vscode/
+
+# Claude Code — track shared config (.claude/settings.json, .claude/agents/, .githooks/),
+# ignore machine-local files
+.claude/settings.local.json
+.claude/.cache/
+CLAUDE.local.md

@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+#
+# Pre-commit quality gate for the SeQura Checkout Demo.
+# Enabled by ./setup.sh (git config core.hooksPath .githooks).
+# Bypass once with: git commit --no-verify
+#
+# Lints the *staged* content of each staged PHP file (the index blob via
+# `git show ":<file>"`, not the working tree, so the verdict matches what is
+# committed). Both tools run through the same backend — the app container if it
+# is up, otherwise a throwaway `php:<ver>-cli` image matching the Dockerfile:
+#   - `php -l`  (syntax)   — needs only PHP; runs whenever Docker is available.
+#   - `phpcbf`  (auto-fix) — applies PSR-12 fixes; re-stages a file only when it
+#                            has no unstaged changes (won't pull in WIP).
+#   - `phpcs`   (PSR-12)   — verifies. phpcbf+phpcs need vendor/, so they run
+#                            when the container is up or vendor/ is in the tree.
+# Missing prerequisites skip with a notice; the Code style CI workflow runs the
+# same checks as a backstop.
+
+set -uo pipefail
+
+cd "$(git rev-parse --show-toplevel)"
+REPO_ROOT="$PWD"
+COMPOSE_DIR="src/backend"
+SERVICE="sequra_demo_shop"
+
+# Staged PHP files (added/copied/modified), NUL-delimited to tolerate spaces.
+STAGED_PHP=()
+while IFS= read -r -d '' f; do
+    STAGED_PHP+=("$f")
+done < <(git diff --cached --name-only --diff-filter=ACM -z -- '*.php')
+
+if [ ${#STAGED_PHP[@]} -eq 0 ]; then
+    echo "pre-commit: no staged PHP files — nothing to check."
+    exit 0
+fi
+
+# Choose a backend: the running container, else a throwaway CLI image.
+BACKEND=""
+PHP_IMAGE=""
+if (cd "$COMPOSE_DIR" && docker compose exec -T "$SERVICE" true) >/dev/null 2>&1; then
+    BACKEND="compose"
+elif command -v docker >/dev/null 2>&1; then
+    ver="$(sed -n 's/^FROM php:\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/p' "$COMPOSE_DIR/Dockerfile" | head -1)"
+    [ -n "$ver" ] && { BACKEND="image"; PHP_IMAGE="php:${ver}-cli"; }
+fi
+
+if [ -z "$BACKEND" ]; then
+    echo "pre-commit: Docker unavailable — skipping checks (cannot run php -l / phpcs)."
+    exit 0
+fi
+
+# run_php <args...> — runs a PHP command in the chosen backend, stdin piped through.
+# ponytail: in image mode this is one `docker run` per file per tool; fine for the
+# handful of files a commit touches — batch if that ever gets slow.
+run_php() {
+    if [ "$BACKEND" = "compose" ]; then
+        (cd "$COMPOSE_DIR" && docker compose exec -T "$SERVICE" "$@")
+    else
+        docker run --rm -i -v "$REPO_ROOT/$COMPOSE_DIR":/app -w /app "$PHP_IMAGE" "$@"
+    fi
+}
+
+# phpcs needs vendor/: present in the container, or in the mounted tree for the image.
+phpcs_ok=0
+if [ "$BACKEND" = "compose" ] || [ -f "$COMPOSE_DIR/vendor/bin/phpcs" ]; then
+    phpcs_ok=1
+else
+    echo "pre-commit: vendor/ not installed — skipping phpcs (php -l still runs)."
+fi
+
+echo "▶ Linting ${#STAGED_PHP[@]} staged PHP file(s) via $BACKEND..."
+rc=0
+for f in "${STAGED_PHP[@]}"; do
+    if ! out="$(git show ":$f" | run_php php -l 2>&1)"; then
+        echo "✗ syntax error in staged $f:"
+        echo "$out"
+        rc=1
+        continue
+    fi
+    if [ "$phpcs_ok" -eq 1 ]; then
+        # phpcbf: auto-fix the staged content (it writes the corrected source to
+        # stdout). Re-stage only when the working tree matches the index, so the
+        # fix can't pull in unstaged changes from a partially-staged file.
+        if git diff --quiet -- "$f"; then
+            fixed="$(mktemp)"
+            git show ":$f" | run_php php vendor/bin/phpcbf --standard=PSR12 --stdin-path="$f" - > "$fixed" 2>/dev/null || true
+            if [ -s "$fixed" ] && ! git show ":$f" | cmp -s - "$fixed"; then
+                cp "$fixed" "$f"
+                git add -- "$f"
+                echo "  phpcbf auto-fixed $f (re-staged)"
+            fi
+            rm -f "$fixed"
+        fi
+        # phpcs: verify the (possibly re-staged) staged content.
+        git show ":$f" | run_php php vendor/bin/phpcs --standard=PSR12 --stdin-path="$f" - || rc=1
+    fi
+done
+
+[ "$rc" -eq 0 ] || { echo "Fix the above (or commit with --no-verify)."; exit 1; }
+echo "✓ Pre-commit checks passed."

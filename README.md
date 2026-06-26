@@ -185,7 +185,7 @@ APP_ENV=development
 
 2. Start the application:
    ```bash
-   cd backend
+   cd src/backend
    docker compose up
    ```
    This builds the Docker image and starts the container. The `entrypoint.sh` script then runs automatically on each container start:
@@ -219,7 +219,7 @@ No restart is needed — the application reads the updated data files on each re
 
 For frontend development with hot reload (instead of rebuilding via Docker):
 ```bash
-cd frontend
+cd src/frontend
 npm install
 npm run dev
 ```

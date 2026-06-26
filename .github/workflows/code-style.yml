@@ -1,0 +1,33 @@
+name: Code style
+
+# Runs the same PSR-12 / syntax checks as the local git hooks, so the gate does
+# not depend on a developer having ./setup.sh's hooks installed.
+on:
+  push:
+  pull_request:
+
+jobs:
+  phpcs:
+    name: PHPCS (PSR-12)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # PHP version matches src/backend/Dockerfile (FROM php:8.4-apache).
+      - name: Set up PHP 8.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          tools: composer
+
+      - name: Install dependencies
+        working-directory: src/backend
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: PHP syntax check
+        working-directory: src/backend
+        run: find src -name '*.php' -print0 | xargs -0 -n1 php -l
+
+      - name: PHPCS (PSR-12)
+        working-directory: src/backend
+        run: vendor/bin/phpcs --standard=PSR12 src/

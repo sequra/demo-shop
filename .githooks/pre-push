@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+#
+# Pre-push quality gate for the SeQura Checkout Demo.
+# Enabled by ./setup.sh (git config core.hooksPath .githooks).
+# Bypass once with: git push --no-verify
+#
+# Runs the full PSR-12 sweep over src/ when the push contains PHP changes;
+# skips docs-only / non-PHP pushes. Runs in the app container if it is up, else
+# a throwaway php:<ver>-cli image when vendor/ is installed; skips with a notice
+# if neither is available (degrade gracefully — the Code style CI workflow runs
+# the same sweep as a backstop).
+
+set -uo pipefail
+
+cd "$(git rev-parse --show-toplevel)"
+REPO_ROOT="$PWD"
+
+COMPOSE_DIR="src/backend"
+SERVICE="sequra_demo_shop"
+ZERO="0000000000000000000000000000000000000000"
+
+# Detect PHP changes across every ref being pushed.
+# stdin lines: <local_ref> <local_sha> <remote_ref> <remote_sha>
+changed_php=0
+while read -r local_ref local_sha remote_ref remote_sha; do
+    [ "$local_sha" = "$ZERO" ] && continue   # branch deletion — nothing to lint
+    if [ "$remote_sha" = "$ZERO" ]; then
+        base="$(git merge-base origin/master "$local_sha" 2>/dev/null || true)"
+        if [ -z "$base" ]; then
+            changed_php=1   # can't bound the range cheaply — run the check
+            continue
+        fi
+        range="$base..$local_sha"
+    else
+        range="$remote_sha..$local_sha"
+    fi
+    if git diff --name-only "$range" -- '*.php' | grep -q .; then
+        changed_php=1
+    fi
+done
+
+if [ "$changed_php" -eq 0 ]; then
+    echo "pre-push: no PHP changes in the pushed commits — skipping phpcs."
+    exit 0
+fi
+
+# Choose a backend that can run phpcs: the running container, or a throwaway
+# php:<ver>-cli image (phpcs needs only PHP + vendor/, not the full stack).
+if (cd "$COMPOSE_DIR" && docker compose exec -T "$SERVICE" true) >/dev/null 2>&1; then
+    run_phpcs() { (cd "$COMPOSE_DIR" && docker compose exec -T "$SERVICE" "$@"); }
+elif command -v docker >/dev/null 2>&1 && [ -f "$COMPOSE_DIR/vendor/bin/phpcs" ]; then
+    ver="$(sed -n 's/^FROM php:\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/p' "$COMPOSE_DIR/Dockerfile" | head -1)"
+    if [ -z "$ver" ]; then
+        echo "pre-push: cannot determine PHP version from Dockerfile — skipping phpcs."
+        exit 0
+    fi
+    run_phpcs() { docker run --rm -v "$REPO_ROOT/$COMPOSE_DIR":/app -w /app "php:${ver}-cli" "$@"; }
+else
+    echo "pre-push: no phpcs backend (container down and vendor/ not installed) — skipping phpcs."
+    exit 0
+fi
+
+echo "▶ phpcs --standard=PSR12 src/ (full sweep)..."
+if ! run_phpcs php vendor/bin/phpcs --standard=PSR12 src/; then
+    echo "✗ phpcs found violations — fix them or push with --no-verify."
+    exit 1
+fi
+
+echo "✓ Pre-push checks passed."

@@ -74,7 +74,8 @@ final readonly class CheckoutController
                 'paymentMethods' => $responseArray['availablePaymentMethods'],
                 'merchantRef' => $credentials->getMerchantId(),
                 'assetKey' => $credentials->getAssetsKey(),
-                'scriptUri' => $widgetData['scriptUri'] ?? 'https://sandbox.sequracdn.com/assets/sequra-checkout.min.js',
+                'scriptUri' => $widgetData['scriptUri']
+                    ?? 'https://sandbox.sequracdn.com/assets/sequra-checkout.min.js',
             ]);
         } catch (Throwable $e) {
             return Response::json(['error' => $e->getMessage()], 500);
