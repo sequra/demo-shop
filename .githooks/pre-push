@@ -5,12 +5,14 @@
 # Bypass once with: git push --no-verify
 #
 # Runs the full PSR-12 sweep over src/ when the push contains PHP changes;
-# skips docs-only / non-PHP pushes. A down container skips with a notice
-# rather than blocking the push (degrade gracefully — no CI to defer to).
+# skips docs-only / non-PHP pushes. Runs in the app container if it is up, else
+# a throwaway php:<ver>-cli image when vendor/ is installed; skips with a notice
+# if neither is available (degrade gracefully — there is no CI to defer to).
 
 set -uo pipefail
 
 cd "$(git rev-parse --show-toplevel)"
+REPO_ROOT="$PWD"
 
 COMPOSE_DIR="src/backend"
 SERVICE="sequra_demo_shop"
@@ -41,13 +43,24 @@ if [ "$changed_php" -eq 0 ]; then
     exit 0
 fi
 
-if ! (cd "$COMPOSE_DIR" && docker compose exec -T "$SERVICE" true) >/dev/null 2>&1; then
-    echo "pre-push: $SERVICE container is not running — skipping phpcs (run 'docker compose up' to enable)."
+# Choose a backend that can run phpcs: the running container, or a throwaway
+# php:<ver>-cli image (phpcs needs only PHP + vendor/, not the full stack).
+if (cd "$COMPOSE_DIR" && docker compose exec -T "$SERVICE" true) >/dev/null 2>&1; then
+    run_phpcs() { (cd "$COMPOSE_DIR" && docker compose exec -T "$SERVICE" "$@"); }
+elif command -v docker >/dev/null 2>&1 && [ -f "$COMPOSE_DIR/vendor/bin/phpcs" ]; then
+    ver="$(sed -n 's/^FROM php:\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/p' "$COMPOSE_DIR/Dockerfile" | head -1)"
+    if [ -z "$ver" ]; then
+        echo "pre-push: cannot determine PHP version from Dockerfile — skipping phpcs."
+        exit 0
+    fi
+    run_phpcs() { docker run --rm -v "$REPO_ROOT/$COMPOSE_DIR":/app -w /app "php:${ver}-cli" "$@"; }
+else
+    echo "pre-push: no phpcs backend (container down and vendor/ not installed) — skipping phpcs."
     exit 0
 fi
 
 echo "▶ phpcs --standard=PSR12 src/ (full sweep)..."
-if ! (cd "$COMPOSE_DIR" && docker compose exec -T "$SERVICE" vendor/bin/phpcs --standard=PSR12 src/); then
+if ! run_phpcs php vendor/bin/phpcs --standard=PSR12 src/; then
     echo "✗ phpcs found violations — fix them or push with --no-verify."
     exit 1
 fi
