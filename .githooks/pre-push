@@ -7,7 +7,8 @@
 # Runs the full PSR-12 sweep over src/ when the push contains PHP changes;
 # skips docs-only / non-PHP pushes. Runs in the app container if it is up, else
 # a throwaway php:<ver>-cli image when vendor/ is installed; skips with a notice
-# if neither is available (degrade gracefully — there is no CI to defer to).
+# if neither is available (degrade gracefully — the Code style CI workflow runs
+# the same sweep as a backstop).
 
 set -uo pipefail
 

@@ -13,7 +13,8 @@
 #                            has no unstaged changes (won't pull in WIP).
 #   - `phpcs`   (PSR-12)   — verifies. phpcbf+phpcs need vendor/, so they run
 #                            when the container is up or vendor/ is in the tree.
-# Missing prerequisites skip with a notice (there is no CI to defer to).
+# Missing prerequisites skip with a notice; the Code style CI workflow runs the
+# same checks as a backstop.
 
 set -uo pipefail
 

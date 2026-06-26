@@ -43,7 +43,10 @@ No automated test suite. Testing is manual through the browser checkout flow.
 ```bash
 ./setup.sh                         # git config core.hooksPath .githooks
 ```
-Enables the shared hooks in `.githooks/`: `pre-commit` runs `php -l` on staged PHP plus PSR-12 `phpcs` when the container is up; `pre-push` runs the full `phpcs src/` sweep on PHP-touching pushes. Both skip with a notice when the container is down (there is no CI). Bypass once with `--no-verify`.
+Enables the shared hooks in `.githooks/`: `pre-commit` runs `php -l` + `phpcbf`/`phpcs` (PSR-12) on staged PHP, and `pre-push` runs the full `phpcs src/` sweep on PHP-touching pushes. Both run inside the app container if it is up, otherwise a throwaway `php:<ver>-cli` image, and skip with a notice only when Docker is unavailable. Bypass a hook once with `--no-verify`.
+
+### Continuous integration
+The `Code style` GitHub Actions workflow (`.github/workflows/code-style.yml`) runs the `php -l` syntax check and the full `phpcs --standard=PSR12 src/` sweep on every push and pull request, so the gate holds even when a developer hasn't installed the hooks.
 
 ## Architecture
 
