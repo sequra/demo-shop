@@ -29,10 +29,15 @@ final readonly class PageController
         $allCredentials = $this->credentialsService->getCredentials();
         $credentials = !empty($allCredentials) ? $allCredentials[0] : null;
 
+        $supportedCountries = array_values(array_unique(array_filter(
+            array_map(static fn($credential) => $credential->getCountry(), $allCredentials)
+        )));
+
         return Response::view(
             'checkout',
             [
                 'assetKey' => $credentials ? $credentials->getAssetsKey() : '',
+                'supportedCountries' => $supportedCountries,
             ]
         );
     }
