@@ -130,13 +130,6 @@ export const translations = {
     'general.loading': 'Loading...',
     'general.pageNotFound': 'Page not found',
     'general.free': 'Free',
-
-    // Countries
-    'country.spain': 'Spain',
-    'country.france': 'France',
-    'country.germany': 'Germany',
-    'country.italy': 'Italy',
-    'country.portugal': 'Portugal',
   },
 
   es: {
@@ -278,13 +271,6 @@ export const translations = {
     'general.loading': 'Cargando...',
     'general.pageNotFound': 'Página no encontrada',
     'general.free': 'Gratis',
-
-    // Countries
-    'country.spain': 'España',
-    'country.france': 'Francia',
-    'country.germany': 'Alemania',
-    'country.italy': 'Italia',
-    'country.portugal': 'Portugal',
   },
 
   fr: {
@@ -426,13 +412,6 @@ export const translations = {
     'general.loading': 'Chargement...',
     'general.pageNotFound': 'Page non trouvée',
     'general.free': 'Gratuit',
-
-    // Countries
-    'country.spain': 'Espagne',
-    'country.france': 'France',
-    'country.germany': 'Allemagne',
-    'country.italy': 'Italie',
-    'country.portugal': 'Portugal',
   },
 
   de: {
@@ -574,12 +553,5 @@ export const translations = {
     'general.loading': 'Laden...',
     'general.pageNotFound': 'Seite nicht gefunden',
     'general.free': 'Kostenlos',
-
-    // Countries
-    'country.spain': 'Spanien',
-    'country.france': 'Frankreich',
-    'country.germany': 'Deutschland',
-    'country.italy': 'Italien',
-    'country.portugal': 'Portugal',
   }
 };
