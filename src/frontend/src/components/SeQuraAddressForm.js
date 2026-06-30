@@ -7,6 +7,7 @@ export class SeQuraAddressForm extends LitElement {
 
   static properties = {
     shippingAddress: { type: Object },
+    supportedCountries: { type: Array },
     i18n: { type: Object }
   };
 
@@ -47,11 +48,10 @@ export class SeQuraAddressForm extends LitElement {
           <div class="form-field">
             <label>${this.i18n.t('address.country')}</label>
             <select .value="${addr.country}" @change="${(e) => this._updateField('country', e.target.value)}">
-              <option value="Spain">${this.i18n.t('country.spain')}</option>
-              <option value="France">${this.i18n.t('country.france')}</option>
-              <option value="Germany">${this.i18n.t('country.germany')}</option>
-              <option value="Italy">${this.i18n.t('country.italy')}</option>
-              <option value="Portugal">${this.i18n.t('country.portugal')}</option>
+              ${(this.supportedCountries || []).length
+                ? this.supportedCountries.map(code => html`
+                    <option value="${code}">${this.i18n.countryName(code)}</option>`)
+                : html`<option value="" disabled selected>—</option>`}
             </select>
           </div>
           <button class="save-address-btn" @click="${this._saveAddress}">${this.i18n.t('shipping.continue')}</button>

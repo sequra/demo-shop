@@ -54,6 +54,8 @@ export class SeQuraCheckout extends LitElement {
         super();
 
         this.assetKey = this.getAttribute('asset-key') || '';
+        this.supportedCountries = (this.getAttribute('supported-countries') || '')
+            .split(',').map(c => c.trim()).filter(Boolean);
         this.i18n = new I18nService();
         this.orderBuilder = new OrderBuilderService();
         this.sequraService = new SeQuraService();
@@ -92,7 +94,8 @@ export class SeQuraCheckout extends LitElement {
         this.discountCode = '';
         this.discountAmount = 0;
         this.shippingAddress = {
-            firstName: '', lastName: '', email: '', street: '', city: '', postalCode: '', country: 'Spain'
+            firstName: '', lastName: '', email: '', street: '', city: '', postalCode: '',
+            country: this.supportedCountries[0] || ''
         };
         this.orderCompleted = false;
         this.orderPending = false;
@@ -199,6 +202,7 @@ export class SeQuraCheckout extends LitElement {
                             ${this.currentStep === 1
                                     ? html`<sequra-address-form
                                             .shippingAddress="${this.shippingAddress}"
+                                            .supportedCountries="${this.supportedCountries}"
                                             .i18n="${this.i18n}"
                                             @address-field-changed="${this._onAddressFieldChanged}"
                                             @address-saved="${this._onAddressSaved}"
