@@ -77,6 +77,8 @@ The `Code style` GitHub Actions workflow (`.github/workflows/code-style.yml`) ru
 ### Checkout flow
 1. Address entry → 2. Shipping selection (triggers solicitation POST) → 3. Payment method selection (SeQura widgets from CDN) → 4. Order completion (SeQura identification iFrame) → IPN webhook confirms order → thank-you page.
 
+The address-form country options are **not** hardcoded: `PageController` exposes the configured account's supported country codes (from credentials) via the `supported-countries` attribute on `<sequra-checkout>`, and the form renders one option per code. `shippingAddress.country` holds the ISO code (sent straight through as `country_code`); country names come from native `Intl.DisplayNames` (`I18nService.countryName`), so there are no per-country translation keys.
+
 ### Key integration points
 - Frontend calls backend API at `/api/checkout/solicitation` and `/api/checkout/form`
 - Backend delegates to `sequra/integration-core` which calls SeQura's external API
