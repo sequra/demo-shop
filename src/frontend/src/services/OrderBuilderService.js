@@ -1,10 +1,5 @@
 export class OrderBuilderService {
-  static COUNTRY_MAP = { Spain: 'ES', France: 'FR', Germany: 'DE', Italy: 'IT', Portugal: 'PT' };
   static LANGUAGE_MAP = { en: 'en-GB', es: 'es-ES', fr: 'fr-FR', de: 'de-DE' };
-
-  getCountryCode(country) {
-    return OrderBuilderService.COUNTRY_MAP[country] || 'ES';
-  }
 
   getLanguageCode(langKey) {
     return OrderBuilderService.LANGUAGE_MAP[langKey] || 'es-ES';
@@ -44,7 +39,7 @@ export class OrderBuilderService {
 
   buildPayload({ items, shippingAddress, selectedShipping, shippingCost, discountAmount, discountCode, total, i18n, cartId }) {
     const addr = shippingAddress;
-    const countryCode = this.getCountryCode(addr.country);
+    const countryCode = addr.country;
 
     return {
       order: {

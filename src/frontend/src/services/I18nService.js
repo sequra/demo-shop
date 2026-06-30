@@ -79,6 +79,16 @@ export class I18nService {
     return I18nService.LOCALE_MAP[this.currentLanguage] || 'en-GB';
   }
 
+  // ponytail: Intl.DisplayNames is native (all modern browsers); try/catch guards malformed codes.
+  countryName(code) {
+    if (!code) return '';
+    try {
+      return new Intl.DisplayNames([this.getLocale()], { type: 'region' }).of(code) || code;
+    } catch {
+      return code;
+    }
+  }
+
   getDecimalSeparator() {
     const config = I18nService.CURRENCIES[this.currentCurrency];
     return config ? config.decimalSep : '.';

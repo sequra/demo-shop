@@ -22,7 +22,7 @@ export class SeQuraAddressSummary extends LitElement {
         <div class="address-summary-detail">${addr.email}</div>
         <div class="address-summary-detail">${addr.street}</div>
         <div class="address-summary-detail">${addr.city}, ${addr.postalCode}</div>
-        <div class="address-summary-detail">${addr.country}</div>
+        <div class="address-summary-detail">${this.i18n.countryName(addr.country)}</div>
       `
     });
   }
