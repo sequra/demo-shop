@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SeQura\Demo\Controllers;
 
 use SeQura\Core\BusinessLogic\Domain\Connection\Services\CredentialsService;
+use SeQura\Demo\Config;
 use SeQura\Demo\Platform\MixpanelService;
 use SeQura\Demo\Request;
 use SeQura\Demo\Response;
@@ -46,10 +47,17 @@ final readonly class PageController
         $allCredentials = $this->credentialsService->getCredentials();
         $credentials = !empty($allCredentials) ? $allCredentials[0] : null;
 
+        $merchantId = $_SESSION['merchant_ref'] ?? Config::get('SEQURA_ACCOUNT_KEY', '');
+        $supportedCountries = array_values(array_unique(array_filter(array_map(
+            static fn($credential) => $credential->getCountry(),
+            array_filter($allCredentials, static fn($credential) => $credential->getMerchantId() === $merchantId)
+        ))));
+
         return Response::view(
             'checkout',
             [
                 'assetKey' => $credentials ? $credentials->getAssetsKey() : '',
+                'supportedCountries' => $supportedCountries,
             ]
         );
     }
