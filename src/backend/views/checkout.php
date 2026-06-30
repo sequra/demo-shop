@@ -24,6 +24,7 @@ use SeQura\Demo\Security\CsrfTokenManager;
 <body>
     <sequra-checkout
         asset-key="<?= htmlspecialchars($assetKey ?? '') ?>"
+        supported-countries="<?= htmlspecialchars(implode(',', $supportedCountries ?? [])) ?>"
     ></sequra-checkout>
     <?php if (Config::get('APP_ENV', 'development') === 'development') : ?>
         <script type="module" src="http://localhost:3000/@vite/client"></script>
