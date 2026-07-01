@@ -45,14 +45,15 @@ final readonly class PageController
         }
 
         $allCredentials = $this->credentialsService->getCredentials();
-        $credentials = !empty($allCredentials) ? $allCredentials[0] : null;
-
         $merchantId = DemoCredentialsService::currentMerchantId();
+
+        $merchantCredential = null;
         $supportedCountries = [];
         foreach ($allCredentials as $credential) {
             if ($credential->getMerchantId() !== $merchantId) {
                 continue;
             }
+            $merchantCredential ??= $credential;
             $country = $credential->getCountry();
             if ($country !== '' && !in_array($country, $supportedCountries, true)) {
                 $supportedCountries[] = $country;
@@ -62,7 +63,7 @@ final readonly class PageController
         return Response::view(
             'checkout',
             [
-                'assetKey' => $credentials ? $credentials->getAssetsKey() : '',
+                'assetKey' => $merchantCredential?->getAssetsKey() ?? '',
                 'supportedCountries' => $supportedCountries,
             ]
         );

@@ -48,7 +48,7 @@ export class SeQuraAddressForm extends LitElement {
           <div class="form-field">
             <label>${this.i18n.t('address.country')}</label>
             <select .value="${addr.country}" @change="${(e) => this._updateField('country', e.target.value)}">
-              ${(this.supportedCountries || []).length
+              ${this.supportedCountries.length
                 ? this.supportedCountries.map(code => html`
                     <option value="${code}">${this.i18n.countryName(code)}</option>`)
                 : html`<option value="" disabled selected>—</option>`}

@@ -17,9 +17,11 @@ use SeQura\Demo\Config;
 class CredentialsService extends BaseCredentialsService
 {
     /**
-     * Returns credentials by given county code
+     * Resolves credentials for the current session merchant_ref (falling back to the
+     * account key). The $countryCode is required by the overridden contract but is
+     * intentionally ignored — the demo scopes every request to a single merchant.
      *
-     * @param string $countryCode
+     * @param string $countryCode Ignored; kept for the overridden signature.
      *
      * @return Credentials|null
      */
