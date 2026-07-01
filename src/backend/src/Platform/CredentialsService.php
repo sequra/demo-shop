@@ -25,13 +25,21 @@ class CredentialsService extends BaseCredentialsService
      */
     public function getCredentialsByCountryCode(string $countryCode): ?Credentials
     {
-        $merchantId = $_SESSION['merchant_ref'] ?? Config::get('SEQURA_ACCOUNT_KEY', '');
+        $merchantId = self::currentMerchantId();
         $credentials = $this->getCredentialsByMerchantId($merchantId);
         if ($credentials === null) {
             $this->refreshCredentials();
             $credentials = $this->getCredentialsByMerchantId($merchantId);
         }
         return $credentials;
+    }
+
+    /**
+     * Current merchant: the session merchant_ref, falling back to the configured account key.
+     */
+    public static function currentMerchantId(): string
+    {
+        return $_SESSION['merchant_ref'] ?? Config::get('SEQURA_ACCOUNT_KEY', '');
     }
 
     private function refreshCredentials(): void

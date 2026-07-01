@@ -79,11 +79,14 @@ export class I18nService {
     return I18nService.LOCALE_MAP[this.currentLanguage] || 'en-GB';
   }
 
-  // ponytail: Intl.DisplayNames is native (all modern browsers); try/catch guards malformed codes.
+  // ponytail: Intl.DisplayNames is native; cache one formatter per locale (construction is the costly part), guard bad codes.
   countryName(code) {
     if (!code) return '';
+    const locale = this.getLocale();
     try {
-      return new Intl.DisplayNames([this.getLocale()], { type: 'region' }).of(code) || code;
+      this._regionNames ??= {};
+      const fmt = (this._regionNames[locale] ??= new Intl.DisplayNames([locale], { type: 'region' }));
+      return fmt.of(code) || code;
     } catch {
       return code;
     }
