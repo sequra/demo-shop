@@ -16,7 +16,6 @@ use SeQura\Demo\Config;
  */
 class CredentialsService extends BaseCredentialsService
 {
-
     /**
      * Returns credentials by given county code
      *
