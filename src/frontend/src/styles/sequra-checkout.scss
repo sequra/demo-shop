@@ -683,6 +683,7 @@ sequra-checkout .order-summary {
 /* Item list */
 sequra-checkout .item-list {
   margin: 1rem 0;
+  outline: none;
 }
 
 sequra-checkout .item-list-entry {
@@ -722,6 +723,51 @@ sequra-checkout .item-list-qty {
 
 sequra-checkout .item-list-price {
   font-weight: 600;
+}
+
+sequra-checkout .item-list-qty-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+sequra-checkout .item-list-qty-btn {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--gray-200, #e2e8f0);
+  border-radius: 4px;
+  background: white;
+  cursor: pointer;
+  line-height: 1;
+}
+
+sequra-checkout .item-list-qty-btn:hover:not([aria-disabled="true"]) {
+  background: var(--gray-100, #f1f5f9);
+}
+
+sequra-checkout .item-list-qty-value {
+  min-width: 1.5rem;
+  text-align: center;
+  font-size: 0.875rem;
+}
+
+sequra-checkout .item-list-remove-btn {
+  background: none;
+  border: none;
+  padding: 0 0.25rem;
+  min-height: 24px;
+  font-size: 0.8rem;
+  color: var(--gray-600, #475569);
+  text-decoration: underline;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+sequra-checkout .item-list-qty-btn[aria-disabled="true"],
+sequra-checkout .item-list-remove-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 /* Item list compact (thank-you pages) */

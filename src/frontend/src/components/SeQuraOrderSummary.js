@@ -17,6 +17,7 @@ export class SeQuraOrderSummary extends LitElement {
     total: { type: Number },
     currentStep: { type: Number },
     solicitationLoading: { type: Boolean },
+    itemsEditable: { type: Boolean },
     i18n: { type: Object }
   };
 
@@ -25,7 +26,7 @@ export class SeQuraOrderSummary extends LitElement {
       <div class="order-summary">
         <h3>${this.i18n.t('checkout.orderSummary')}</h3>
 
-        <sequra-item-list .items="${this.items}" .i18n="${this.i18n}"></sequra-item-list>
+        <sequra-item-list .items="${this.items}" .i18n="${this.i18n}" .editable="${this.itemsEditable}"></sequra-item-list>
 
         <sequra-discount-input
           .discountCode="${this.discountCode}"
