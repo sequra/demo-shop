@@ -73,7 +73,10 @@ export class SeQuraCheckout extends LitElement {
             this.currency = this.i18n.currentCurrency;
             this.i18n = Object.assign(Object.create(Object.getPrototypeOf(this.i18n)), this.i18n);
             this.productService.i18n = this.i18n;
-            this.items = this.productService.getAllProducts().map(p => new CartItem(p, p.quantity));
+            const quantities = new Map(this.items.map(item => [item.product.id, item.quantity]));
+            this.items = this.productService.getAllProducts()
+                .filter(p => quantities.has(p.id))
+                .map(p => new CartItem(p, quantities.get(p.id)));
             if (this._paymentMethodsErrorKey) {
                 this.paymentMethodsError = this.i18n.t(this._paymentMethodsErrorKey);
             }
@@ -259,7 +262,9 @@ export class SeQuraCheckout extends LitElement {
                                     .total="${this._total}"
                                     .currentStep="${this.currentStep}"
                                     .solicitationLoading="${this.solicitationLoading}"
+                                    .itemsEditable="${this.currentStep <= 2 && !this.solicitationLoading}"
                                     .i18n="${this.i18n}"
+                                    @item-quantity-changed="${this._onItemQuantityChanged}"
                                     @discount-apply="${this._onDiscountApply}"
                                     @discount-remove="${this._onDiscountRemove}"
                                     @discount-code-changed="${(e) => this.discountCode = e.detail.code}"
@@ -299,6 +304,17 @@ export class SeQuraCheckout extends LitElement {
     _onEditAddress() {
         this.addressSaved = false;
         this.currentStep = 1;
+    }
+
+    _onItemQuantityChanged(e) {
+        const { productId, quantity } = e.detail;
+        this.items = quantity > 0
+            ? this.items.map(item => item.product.id === productId ? new CartItem(item.product, quantity) : item)
+            : this.items.filter(item => item.product.id !== productId);
+        if (this.discountAmount > 0) {
+            const result = this.discountService.applyDiscount(this.discountCode, this._subtotal);
+            if (result.valid) this.discountAmount = result.discountAmount;
+        }
     }
 
     _onShippingSelected(e) {
