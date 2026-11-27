@@ -683,6 +683,7 @@ sequra-checkout .order-summary {
 /* Item list */
 sequra-checkout .item-list {
   margin: 1rem 0;
+  outline: none;
 }
 
 sequra-checkout .item-list-entry {
@@ -741,7 +742,7 @@ sequra-checkout .item-list-qty-btn {
   line-height: 1;
 }
 
-sequra-checkout .item-list-qty-btn:hover:not(:disabled) {
+sequra-checkout .item-list-qty-btn:hover:not([aria-disabled="true"]) {
   background: var(--gray-100, #f1f5f9);
 }
 
@@ -754,7 +755,8 @@ sequra-checkout .item-list-qty-value {
 sequra-checkout .item-list-remove-btn {
   background: none;
   border: none;
-  padding: 0;
+  padding: 0 0.25rem;
+  min-height: 24px;
   font-size: 0.8rem;
   color: var(--gray-600, #475569);
   text-decoration: underline;
@@ -762,7 +764,7 @@ sequra-checkout .item-list-remove-btn {
   cursor: pointer;
 }
 
-sequra-checkout .item-list-qty-btn:disabled,
+sequra-checkout .item-list-qty-btn[aria-disabled="true"],
 sequra-checkout .item-list-remove-btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;

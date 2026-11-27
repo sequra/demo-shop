@@ -46,6 +46,7 @@ export class SeQuraCheckout extends LitElement {
         addressSaved: { type: Boolean },
         currentStep: { type: Number },
         solicitationLoading: { type: Boolean },
+        refreshLoading: { type: Boolean },
         orderPending: { type: Boolean },
         i18n: { type: Object }
     };
@@ -103,6 +104,8 @@ export class SeQuraCheckout extends LitElement {
         this.addressSaved = false;
         this.currentStep = 1;
         this.solicitationLoading = false;
+        this.refreshLoading = false;
+        this._appliedDiscountCode = '';
         this._cartId = null;
         this._orderRef = null;
         this._selectedProductCode = null;
@@ -219,7 +222,7 @@ export class SeQuraCheckout extends LitElement {
                                     ? html`<sequra-shipping-options
                                             .selectedShipping="${this.selectedShipping}"
                                             .shippingCost="${this.shippingCost}"
-                                            .solicitationLoading="${this.solicitationLoading}"
+                                            .solicitationLoading="${this.solicitationLoading || this.refreshLoading}"
                                             .i18n="${this.i18n}"
                                             @shipping-selected="${this._onShippingSelected}"
                                             @shipping-confirmed="${this._onShippingConfirmed}">
@@ -262,7 +265,7 @@ export class SeQuraCheckout extends LitElement {
                                     .total="${this._total}"
                                     .currentStep="${this.currentStep}"
                                     .solicitationLoading="${this.solicitationLoading}"
-                                    .itemsEditable="${this.currentStep <= 2 && !this.solicitationLoading}"
+                                    .itemsEditable="${this.currentStep <= 2 && !this.solicitationLoading && !this.refreshLoading}"
                                     .i18n="${this.i18n}"
                                     @item-quantity-changed="${this._onItemQuantityChanged}"
                                     @discount-apply="${this._onDiscountApply}"
@@ -312,7 +315,7 @@ export class SeQuraCheckout extends LitElement {
             ? this.items.map(item => item.product.id === productId ? new CartItem(item.product, quantity) : item)
             : this.items.filter(item => item.product.id !== productId);
         if (this.discountAmount > 0) {
-            const result = this.discountService.applyDiscount(this.discountCode, this._subtotal);
+            const result = this.discountService.applyDiscount(this._appliedDiscountCode, this._subtotal);
             if (result.valid) this.discountAmount = result.discountAmount;
         }
     }
@@ -372,6 +375,7 @@ export class SeQuraCheckout extends LitElement {
         }
 
         this.discountAmount = result.discountAmount;
+        this._appliedDiscountCode = this.discountCode;
         this.showNotification(this.i18n.t(result.messageKey, messageParams), result.type);
         this.requestUpdate();
         await this._refreshOrderIfNeeded();
@@ -380,6 +384,7 @@ export class SeQuraCheckout extends LitElement {
     async _onDiscountRemove() {
         this.discountAmount = 0;
         this.discountCode = '';
+        this._appliedDiscountCode = '';
         this.showNotification(this.i18n.t('discount.removed'), 'success');
         this.requestUpdate();
         await this._refreshOrderIfNeeded();
@@ -444,7 +449,7 @@ export class SeQuraCheckout extends LitElement {
             selectedShipping: this.selectedShipping,
             shippingCost: this.shippingCost,
             discountAmount: this.discountAmount,
-            discountCode: this.discountCode,
+            discountCode: this._appliedDiscountCode,
             total: this._total,
             i18n: this.i18n,
             cartId: this._cartId
@@ -562,7 +567,12 @@ export class SeQuraCheckout extends LitElement {
             this._selectedPaymentName = null;
             this.requestUpdate();
         }
-        await this._startSolicitation();
+        this.refreshLoading = true;
+        try {
+            await this._startSolicitation();
+        } finally {
+            this.refreshLoading = false;
+        }
         await this.updateComplete;
         this._scheduleWidgetRefresh();
     }
